@@ -1,0 +1,4 @@
+include README.md
+include LICENSE.md
+graft fumis
+recursive-exclude * *.py[co]
