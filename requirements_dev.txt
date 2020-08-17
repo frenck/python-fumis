@@ -5,5 +5,5 @@ pip==20.2.2
 pre-commit==2.6.0
 Sphinx==3.2.1
 twine==3.2.0
-wheel==0.35.0
+wheel==0.35.1
 yamllint==1.24.2
