@@ -20,7 +20,7 @@ async def test_turn_on(event_loop, aresponses):
             status=200, headers={"Content-Type": "application/json"}, text="",
         )
 
-    aresponses.add("api.fumis.si", "/v1/status", "POST", response_handler)
+    aresponses.add("api.fumis.si", "/v1/status/", "POST", response_handler)
 
     async with aiohttp.ClientSession(loop=event_loop) as session:
         fumis = Fumis(
@@ -45,7 +45,7 @@ async def test_turn_off(event_loop, aresponses):
             status=200, headers={"Content-Type": "application/json"}, text="",
         )
 
-    aresponses.add("api.fumis.si", "/v1/status", "POST", response_handler)
+    aresponses.add("api.fumis.si", "/v1/status/", "POST", response_handler)
 
     async with aiohttp.ClientSession(loop=event_loop) as session:
         fumis = Fumis(
@@ -70,7 +70,7 @@ async def test_set_target_temperature(event_loop, aresponses):
             status=200, headers={"Content-Type": "application/json"}, text="",
         )
 
-    aresponses.add("api.fumis.si", "/v1/status", "POST", response_handler)
+    aresponses.add("api.fumis.si", "/v1/status/", "POST", response_handler)
 
     async with aiohttp.ClientSession(loop=event_loop) as session:
         fumis = Fumis(
