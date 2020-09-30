@@ -55,9 +55,15 @@ class Info:
         stats = controller.get("statistic", {})
         temperatures = controller.get("temperatures", {})
         power = controller.get("power", {})
-        temperature = [d for d in temperatures if d["id"] == STOVE_ID][0]
+        if temperatures:
+            temperature = [d for d in temperatures if d["id"] == STOVE_ID][0]
+        else:
+            temperature = {}
         fuels = controller.get("fuels", [])
-        fuel = [d for d in fuels if d["id"] == STOVE_ID][0]
+        if fuels:
+            fuel = [d for d in fuels if d["id"] == STOVE_ID][0]
+        else:
+            fuel = {}
         ecoMode = controller.get("ecoMode", {})
         timers = controller.get("timers", [])
 
@@ -98,9 +104,9 @@ class Info:
             unit_id=unit.get("id", "Unknown"),
             unit_version=unit.get("version", "Unknown"),
             uptime=int(stats.get("uptime", 0)),
-            fuel_quality=int(fuel.get("quality", "Unknown")),
-            fuel_quantity=(float(fuel.get("quantity", "Unknown")) * 100),
-            ecomode_type=int(ecoMode.get("ecoModeSetType", "Unknown")),
+            fuel_quality=int(fuel.get("quality", 0)),
+            fuel_quantity=(float(fuel.get("quantity", 0)) * 100),
+            ecomode_type=int(ecoMode.get("ecoModeSetType", 0)),
             ecomode_state=ecomode_state,
             timers=timers,
         )
