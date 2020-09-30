@@ -2,7 +2,14 @@
 
 import attr
 
-from .const import STATE_MAPPING, STATE_UNKNOWN, STATUS_MAPPING, STATUS_UNKNOWN, STOVE_ID, ECO_MAPPING
+from .const import (
+    ECO_MAPPING,
+    STATE_MAPPING,
+    STATE_UNKNOWN,
+    STATUS_MAPPING,
+    STATUS_UNKNOWN,
+    STOVE_ID,
+)
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -39,7 +46,6 @@ class Info:
     kw: float
     actualpower: float
 
-
     @staticmethod
     def from_dict(data: dict):
         """Return device object from Fumis WiRCU device response."""
@@ -49,10 +55,9 @@ class Info:
         stats = controller.get("statistic", {})
         temperatures = controller.get("temperatures", {})
         power = controller.get("power", {})
-        #temperature = temperatures[0] if temperatures else {}
-        temperature = [d for d in temperatures if d['id'] == STOVE_ID][0]
+        temperature = [d for d in temperatures if d["id"] == STOVE_ID][0]
         fuels = controller.get("fuels", [])
-        fuel = [d for d in fuels if d['id'] == STOVE_ID][0]
+        fuel = [d for d in fuels if d["id"] == STOVE_ID][0]
         ecoMode = controller.get("ecoMode", {})
         timers = controller.get("timers", [])
 

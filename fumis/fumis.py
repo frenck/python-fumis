@@ -138,9 +138,7 @@ class Fumis:
 
     async def set_mode(self, mode: int) -> None:
         """Set target mode of Fumis WiRCU device."""
-        await self._send_command(
-            {"ecoMode":{"ecoModeEnable": mode}}
-        )
+        await self._send_command({"ecoMode": {"ecoModeEnable": mode}})
 
     async def close(self) -> None:
         """Close open client session."""
