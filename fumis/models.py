@@ -32,9 +32,9 @@ class Info:
     overheatings: int
     uptime: int
     fuel_quality: int
-    fuel_quantity: int
+    fuel_quantity: float
     ecomode_type: int
-    ecomode_state: int
+    ecomode_state: str
     timers: list
     kw: float
     actualpower: float
