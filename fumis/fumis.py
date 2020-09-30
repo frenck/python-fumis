@@ -105,7 +105,7 @@ class Fumis:
             "controller": data,
         }
 
-        await self._request("status", method="POST", data=command_data)
+        await self._request("status/", method="POST", data=command_data)
 
     async def update_info(self) -> Optional[Info]:
         """Get all information about the Fumis WiRCU device."""
@@ -134,6 +134,12 @@ class Fumis:
         """Set target temperature of Fumis WiRCU device."""
         await self._send_command(
             {"temperatures": [{"set": temperature, "id": 1}], "type": 0}
+        )
+
+    async def set_mode(self, mode: int) -> None:
+        """Set target mode of Fumis WiRCU device."""
+        await self._send_command(
+            {"ecoMode":{"ecoModeEnable": mode}}
         )
 
     async def close(self) -> None:
