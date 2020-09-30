@@ -767,8 +767,8 @@
       ]
     },
     "ecoMode": {
-      "ecoModeSetType": null,
-      "ecoModeEnable": null
+      "ecoModeSetType": 1,
+      "ecoModeEnable": 0
     },
     "hybrid": null,
     "fans": [
