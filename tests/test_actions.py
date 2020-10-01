@@ -78,6 +78,7 @@ async def test_set_target_temperature(event_loop, aresponses):
         )
         await fumis.set_target_temperature(23.4)
 
+
 @pytest.mark.asyncio
 async def test_set_mode(event_loop, aresponses):
     """Test setting mode of a Fumis WiRCU device."""
