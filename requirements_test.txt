@@ -3,7 +3,7 @@ coverage==5.5
 flake8==3.9.1
 flake8-docstrings==1.6.0
 isort==5.8.0
-mypy==0.812
+mypy==0.920
 pylint==2.8.2
 pytest==6.2.4
 pytest-asyncio==0.15.1
