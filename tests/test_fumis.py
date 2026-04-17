@@ -1,5 +1,6 @@
 """Tests for the Fumis WiRCU API client."""
 
+# pylint: disable=protected-access
 import logging
 from datetime import UTC, datetime
 

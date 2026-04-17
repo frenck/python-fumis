@@ -1,5 +1,6 @@
 """Live TUI dashboard for the Fumis WiRCU."""
 
+# pylint: disable=import-error,too-few-public-methods
 from __future__ import annotations
 
 import asyncio
@@ -61,7 +62,7 @@ class StatusWidget(Static):
         combustion_str = f"{combustion}\u00b0" if combustion is not None else ""
 
         fuel = c.fuel()
-        fuel_pct = fuel.quantity_percentage if fuel and fuel.quantity is not None else 0
+        fuel_pct = (fuel.quantity_percentage or 0) if fuel else 0
         fuel_bar = "\u2588" * int(fuel_pct / 10) + "\u2591" * (10 - int(fuel_pct / 10))
 
         power_str = f"{c.power.kw} kW (level {c.power.set_power})"
@@ -519,7 +520,7 @@ class FumisTuiApp(App[None]):
             if confirmed:
                 self._send_command("on")
 
-        self.push_screen(
+        self.push_screen(  # ty: ignore[no-matching-overload]
             ConfirmDialog("\U0001f525", "Turn on the stove?"),
             _on_dismiss,
         )
@@ -531,7 +532,7 @@ class FumisTuiApp(App[None]):
             if confirmed:
                 self._send_command("off")
 
-        self.push_screen(
+        self.push_screen(  # ty: ignore[no-matching-overload]
             ConfirmDialog("\u2744\ufe0f", "Turn off the stove?"),
             _on_dismiss,
         )

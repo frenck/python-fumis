@@ -1,9 +1,10 @@
 """Tests for the Fumis CLI."""
 
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,protected-access
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -22,9 +23,6 @@ from fumis.models import Info
 
 if TYPE_CHECKING:
     from syrupy.assertion import SnapshotAssertion
-
-
-from pathlib import Path
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 

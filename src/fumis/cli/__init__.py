@@ -59,7 +59,7 @@ JsonFlag = Annotated[
 ]
 
 
-@cli.callback(invoke_without_command=True)
+@cli.callback(invoke_without_command=True)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
 def main_callback(
     ctx: typer.Context,
     mac: Annotated[
@@ -253,8 +253,8 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
     status_table.add_row("\u26a1 Power", f"{c.power.kw} kW (level {c.power.set_power})")
 
     fuel = c.fuel()
-    if fuel and fuel.quantity is not None:
-        pct = fuel.quantity_percentage
+    pct = fuel.quantity_percentage if fuel else None
+    if pct is not None:
         fuel_bar = "\u2588" * int(pct / 10) + "\u2591" * (10 - int(pct / 10))
         status_table.add_row("\u26fd Fuel", f"{fuel_bar} {pct:.0f}%")
 
@@ -456,8 +456,8 @@ async def timer_command(
         bool | None,
         typer.Argument(help="Enable (true) or disable (false) timer schedule"),
     ] = None,
-    mac: Mac = None,  # type: ignore[assignment]
-    password: Password = None,  # type: ignore[assignment]
+    mac: Mac = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
+    password: Password = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
 ) -> None:
     """Show, enable, or disable the weekly timer schedule.
 
@@ -507,8 +507,8 @@ async def timer_command(
 
 @cli.command("sync-clock")
 async def sync_clock_command(
-    mac: Mac = None,  # type: ignore[assignment]
-    password: Password = None,  # type: ignore[assignment]
+    mac: Mac = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
+    password: Password = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
 ) -> None:
     """Sync the stove's clock to the current time."""
     with console.status("\U0001f552 Syncing clock..."):
@@ -557,10 +557,21 @@ ALERT_DESCRIPTIONS: dict[int, str] = {
 }
 
 
+def _format_error_date(date_val: int, time_val: int) -> str:
+    """Format an error history date/time entry."""
+    parts: list[str] = []
+    if date_val > 20000101:
+        d = str(date_val)
+        parts.append(f"{d[:4]}-{d[4:6]}-{d[6:]}")
+    if time_val:
+        parts.append(f"{time_val // 100:02d}:{time_val % 100:02d}")
+    return " ".join(parts) or "-"
+
+
 @cli.command("errors")
 async def errors_command(
-    mac: Mac = None,  # type: ignore[assignment]
-    password: Password = None,  # type: ignore[assignment]
+    mac: Mac = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
+    password: Password = None,  # type: ignore[assignment]  # ty: ignore[invalid-parameter-default]
 ) -> None:
     """Show current errors, alerts, and error history."""
     info = await _fetch_info(mac, password)
@@ -571,9 +582,7 @@ async def errors_command(
     if c.error == 0:
         console.print("\u2705 [green bold]No active error[/green bold]")
     else:
-        console.print(
-            f"\u274c [red bold]Error E{c.error}:[/red bold] {error_desc}"
-        )
+        console.print(f"\u274c [red bold]Error E{c.error}:[/red bold] {error_desc}")
 
     # Current alert
     alert_desc = ALERT_DESCRIPTIONS.get(c.alert, "Unknown")
@@ -598,31 +607,20 @@ async def errors_command(
         time_val = diag.variable(base + 3) or 0
         history.append((error_code, date_val, time_val))
 
-    if history:
-        console.print()
-        table = Table(
-            title="Error History", show_header=True, border_style="dim"
-        )
-        table.add_column("#", style="bold")
-        table.add_column("Code")
-        table.add_column("Description")
-        table.add_column("Date")
-        for i, (code, date_val, time_val) in enumerate(history, 1):
-            desc = ERROR_DESCRIPTIONS.get(code, f"Unknown ({code})")
-            if date_val > 20000101:
-                d = str(date_val)
-                date_display = f"{d[:4]}-{d[4:6]}-{d[6:]}"
-            else:
-                date_display = ""
-            if time_val:
-                time_str = f"{time_val // 100:02d}:{time_val % 100:02d}"
-                date_display = f"{date_display} {time_str}".strip()
-            if not date_display:
-                date_display = "-"
-            table.add_row(str(i), f"E{code}", desc, date_display)
-        console.print(table)
-    else:
+    if not history:
         console.print("\n[dim]No error history.[/dim]")
+        return
+
+    console.print()
+    table = Table(title="Error History", show_header=True, border_style="dim")
+    table.add_column("#", style="bold")
+    table.add_column("Code")
+    table.add_column("Description")
+    table.add_column("Date")
+    for i, (code, date_val, time_val) in enumerate(history, 1):
+        desc = ERROR_DESCRIPTIONS.get(code, f"Unknown ({code})")
+        table.add_row(str(i), f"E{code}", desc, _format_error_date(date_val, time_val))
+    console.print(table)
 
 
 @cli.command("diagnostics")
