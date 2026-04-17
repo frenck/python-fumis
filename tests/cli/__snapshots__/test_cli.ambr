@@ -323,7 +323,7 @@
       "current_time": 1574360658,
       "timer_enable": false,
       "fuel_type": 1,
-      "time_to_service": -1,
+      "time_to_service": "-1",
       "power": {
         "kw": 0.0,
         "actual_power": 0,

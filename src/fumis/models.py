@@ -166,7 +166,10 @@ class Temperature(_BaseModel):
 class Power(_BaseModel):
     """Power state of the Fumis controller."""
 
-    kw: float = 0
+    kw: float = field(
+        default=0,
+        metadata=field_options(serialization_strategy=_StringToFloatStrategy()),
+    )
     actual_power: int = field(default=0, metadata=field_options(alias="actualPower"))
     set_power: int = field(default=0, metadata=field_options(alias="setPower"))
     set_type: int = field(default=0, metadata=field_options(alias="setType"))
@@ -388,7 +391,11 @@ class Controller(_BaseModel):
     )
     fuel_type: int = field(default=0, metadata=field_options(alias="fuelType"))
     time_to_service: int = field(
-        default=0, metadata=field_options(alias="timeToService")
+        default=0,
+        metadata=field_options(
+            alias="timeToService",
+            serialization_strategy=_StringToIntStrategy(),
+        ),
     )
     delayed_start_at: datetime | None = field(
         default=None,
