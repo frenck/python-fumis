@@ -41,7 +41,7 @@ packages = [{ include = "fumis", from = "src" }]
 dependencies = ['aiohttp (>=3.0.0)', 'awesomeversion (>=22.0.0)', 'mashumaro (>=3.13,<4.0.0)', 'orjson (>=3.9.8)', 'yarl (>=1.6.0)']
 
 [project.optional-dependencies]
-cli = ["rich>=13.0.0", "textual>=3.0.0,<4.0.0; python_version<'4.0'", "textual-plotext>=0.2.0,<1.0.0; python_version<'4.0'", "typer>=0.15.1"]
+cli = ["rich>=14.0.0", "textual>=8.0.0,<9.0.0; python_version<'4.0'", "textual-plotext>=1.0.0,<2.0.0; python_version<'4.0'", "typer>=0.15.1"]
 
 [project.scripts]
 fumis = "fumis._cli:main"
