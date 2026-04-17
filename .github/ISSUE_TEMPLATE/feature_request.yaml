@@ -1,0 +1,34 @@
+---
+name: Feature request
+description: Suggest a new feature for the Fumis Python client.
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the feature you'd like to see.
+    validations:
+      required: true
+  - type: input
+    id: stove-brand
+    attributes:
+      label: Stove brand
+      description: The manufacturer of your stove (if relevant).
+      placeholder: e.g., Austroflamm, Heta, Eco Spar, Rika
+    validations:
+      required: false
+  - type: input
+    id: stove-model
+    attributes:
+      label: Stove model
+      description: The model name of your stove (if relevant).
+      placeholder: e.g., Clou Duo, Green 200
+    validations:
+      required: false
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: Any additional context, examples, or references.
+    validations:
+      required: false

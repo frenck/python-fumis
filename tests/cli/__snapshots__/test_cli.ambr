@@ -1,0 +1,1313 @@
+# serializer version: 1
+# name: test_authentication_error_handler
+  '''
+  ╭──────────────────── Authentication error ─────────────────────╮
+  │                                                               │
+  │     Invalid MAC address or PIN. Please check your credentials │
+  │     and try again.                                            │
+  │                                                               │
+  ╰───────────────────────────────────────────────────────────────╯
+  
+  '''
+# ---
+# name: test_cli_structure
+  dict({
+    'diagnostics': list([
+      'mac',
+      'password',
+    ]),
+    'dump': list([
+      'mac',
+      'password',
+    ]),
+    'eco': list([
+      'mac',
+      'password',
+      'state',
+    ]),
+    'errors': list([
+      'mac',
+      'password',
+    ]),
+    'info': list([
+      'mac',
+      'output_json',
+      'password',
+    ]),
+    'off': list([
+      'mac',
+      'password',
+    ]),
+    'on': list([
+      'mac',
+      'password',
+    ]),
+    'power': list([
+      'level',
+      'mac',
+      'password',
+    ]),
+    'sync-clock': list([
+      'mac',
+      'password',
+    ]),
+    'temperature': list([
+      'mac',
+      'password',
+      'temperature',
+      'zone',
+    ]),
+    'timer': list([
+      'mac',
+      'password',
+      'state',
+    ]),
+  })
+# ---
+# name: test_connection_error_handler
+  '''
+  ╭─────────────────────── Connection error ────────────────────────╮
+  │                                                                 │
+  │     Could not connect to the Fumis WiRCU API. Please check your │
+  │     internet connection and try again.                          │
+  │                                                                 │
+  ╰─────────────────────────────────────────────────────────────────╯
+  
+  '''
+# ---
+# name: test_diagnostics_command
+  '''
+  ╭──────────────────────────────────────────── Sensors ─────────────────────────────────────────────╮
+  │ ┌───────────────────────────────────────────────────────────────────┬──────────────────────────┐ │
+  │ │ Fan 1 speed                                                       │ 90                       │ │
+  │ │ Fan 2 speed                                                       │ 0                        │ │
+  │ │ Exhaust gas temp                                                  │ 0°                       │ │
+  │ │ Combustion chamber                                                │ 104.0°                   │ │
+  │ │ Backwater temp                                                    │ 232°                     │ │
+  │ │ F02                                                               │ 875                      │ │
+  │ │ Pressure                                                          │ 941                      │ │
+  │ │ Power (kW)                                                        │ 7.0                      │ │
+  │ │ Power level                                                       │ 3                        │ │
+  │ └───────────────────────────────────────────────────────────────────┴──────────────────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ╭───────────────────────────────────────── Digital Inputs ─────────────────────────────────────────╮
+  │ ┌──────────────────────────────────────────────────────────────────┬───────────────────────────┐ │
+  │ │ IO1 (STB)                                                        │ ON                        │ │
+  │ │ IO2                                                              │ OFF                       │ │
+  │ │ IO3                                                              │ OFF                       │ │
+  │ │ IO4 (Door)                                                       │ ON                        │ │
+  │ └──────────────────────────────────────────────────────────────────┴───────────────────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ╭────────────────────────────────────── Temperature Channels ──────────────────────────────────────╮
+  │ ┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓ │
+  │ ┃       ID ┃            Actual ┃              Setpoint ┃ On screen               ┃ Type        ┃ │
+  │ ┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩ │
+  │ │        5 │                   │                       │                         │             │ │
+  │ │        1 │             23.2° │                 25.4° │ yes                     │ 1           │ │
+  │ │        7 │            104.0° │                       │                         │ 10          │ │
+  │ │        6 │                   │                       │                         │             │ │
+  │ │        8 │                   │                  0.5° │                         │ 1           │ │
+  │ │        9 │                   │                  0.5° │                         │ 1           │ │
+  │ │        4 │                   │                       │                         │             │ │
+  │ │        2 │                   │                       │                         │             │ │
+  │ │        3 │                   │                       │                         │             │ │
+  │ └──────────┴───────────────────┴───────────────────────┴─────────────────────────┴─────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  
+  '''
+# ---
+# name: test_diagnostics_pellet_stove
+  '''
+  ╭──────────────────────────────────────────── Sensors ─────────────────────────────────────────────╮
+  │ ┌───────────────────────────────────────────────────────────────────┬──────────────────────────┐ │
+  │ │ Fan 1 speed                                                       │ 94                       │ │
+  │ │ Fan 2 speed                                                       │ 0                        │ │
+  │ │ Exhaust gas temp                                                  │ 0°                       │ │
+  │ │ Combustion chamber                                                │ 256.0°                   │ │
+  │ │ Backwater temp                                                    │ 189°                     │ │
+  │ │ F02                                                               │ 1347                     │ │
+  │ │ Pressure                                                          │ 608                      │ │
+  │ │ Power (kW)                                                        │ 3.6                      │ │
+  │ │ Power level                                                       │ 5                        │ │
+  │ └───────────────────────────────────────────────────────────────────┴──────────────────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ╭───────────────────────────────────────── Digital Inputs ─────────────────────────────────────────╮
+  │ ┌──────────────────────────────────────────────────────────────────┬───────────────────────────┐ │
+  │ │ IO1 (STB)                                                        │ ON                        │ │
+  │ │ IO2                                                              │ ON                        │ │
+  │ │ IO3                                                              │ OFF                       │ │
+  │ │ IO4 (Door)                                                       │ ON                        │ │
+  │ └──────────────────────────────────────────────────────────────────┴───────────────────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ╭────────────────────────────────────── Temperature Channels ──────────────────────────────────────╮
+  │ ┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓ │
+  │ ┃       ID ┃            Actual ┃              Setpoint ┃ On screen               ┃ Type        ┃ │
+  │ ┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩ │
+  │ │        1 │             18.9° │                 10.0° │ yes                     │ 1           │ │
+  │ │        2 │                   │                       │                         │             │ │
+  │ │        3 │            307.0° │                125.0° │ yes                     │             │ │
+  │ │        4 │                   │                       │                         │             │ │
+  │ │        5 │                   │                       │ yes                     │             │ │
+  │ │        6 │                   │                       │                         │             │ │
+  │ │        7 │            256.0° │                       │                         │ 10          │ │
+  │ │        8 │                   │                  0.5° │                         │ 1           │ │
+  │ │        9 │                   │                       │                         │ 1           │ │
+  │ └──────────┴───────────────────┴───────────────────────┴─────────────────────────┴─────────────┘ │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+  
+  '''
+# ---
+# name: test_eco_off_command
+  '''
+  🌱 Eco mode disabled.
+  
+  '''
+# ---
+# name: test_eco_on_command
+  '''
+  🌱 Eco mode enabled.
+  
+  '''
+# ---
+# name: test_errors_no_errors
+  '''
+  ✅ No active error
+  ✅ No active alert
+  
+  No error history.
+  
+  '''
+# ---
+# name: test_errors_with_alert
+  '''
+  ✅ No active error
+  ⚠️  Alert A004: Low battery
+  
+  No error history.
+  
+  '''
+# ---
+# name: test_errors_with_error
+  '''
+  ❌ Error E102: Chimney/burning pot dirty or manually stopped
+  ✅ No active alert
+  
+             Error History            
+  ┏━━━┳━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━┓
+  ┃ # ┃ Code ┃ Description   ┃ Date  ┃
+  ┡━━━╇━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━┩
+  │ 1 │ E241 │ Chimney Alarm │ 00:08 │
+  │ 2 │ E241 │ Chimney Alarm │ 00:10 │
+  │ 3 │ E241 │ Chimney Alarm │ 23:47 │
+  └───┴──────┴───────────────┴───────┘
+  
+  '''
+# ---
+# name: test_info_alert_state
+  '''
+  
+    🏭 Fumis WiRCU
+    ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                ⭘  Off                  │
+  │   ⚠️  Alert                A004 Low battery        │
+  │   🌡️  Temperature          19.9° → 21.8°           │
+  │   💨 Exhaust               23°                     │
+  │   ⚡ Power                 0.0 kW (level 2)        │
+  │   ⛽ Fuel                  ░░░░░░░░░░ 0%           │
+  │   ⭘  Eco mode              Off                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ─────────╮  ╭───── Statistics ─────╮ 
+   │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
+   │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
+   ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
+                                  │  🔧 Service  in -1h  │ 
+                                  ╰──────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_clou_duo
+  '''
+  
+    🏭 Austroflamm Clou Duo
+    ID: AABB11223344 • WiRCU 2.5.0 • Controller 2.6.0 • API 1.3
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                ▲  Pre Heating          │
+  │   🌡️  Temperature          23.2° → 25.4°           │
+  │   🔥 Combustion            104.0°                  │
+  │   ⚡ Power                 7.0 kW (level 3)        │
+  │   ⛽ Fuel                  ██░░░░░░░░ 27%          │
+  │   🚪 Door                  Closed                  │
+  │   🌱  Eco mode             On                      │
+  │   ❄️  Antifreeze           On (5.0°)               │
+  │   🪵  Hybrid               Yes                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ──────────╮  ╭────── Statistics ──────╮ 
+   │  📡 IP      192.168.1.119  │  │  🔄 Starts   11        │ 
+   │  📶 WiFi    -62 dBm (76%)  │  │  🔥 Heating  31h       │ 
+   │  🌡️  WiRCU  30.8°          │  │  ⏱️  Uptime  126h      │ 
+   │  📋 Params  v15            │  │  🔧 Service  in 2129h  │ 
+   ╰────────────────────────────╯  ╰────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_combustion_state
+  '''
+  
+    🏭 Austroflamm Clou Duo
+    ID: AABBCCDDEEFF • WiRCU 2.5.0 • Controller 2.6.0 • API 1.3
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                🔥  Combustion          │
+  │   🌡️  Temperature          20.7° → 25.0°           │
+  │   🔥 Combustion            206.0°                  │
+  │   ⚡ Power                 4.6 kW (level 5)        │
+  │   ⛽ Fuel                  █████████░ 95%          │
+  │   🚪 Door                  Closed                  │
+  │   ⭘  Eco mode              Off                     │
+  │   ❄️  Antifreeze           On (5.0°)               │
+  │   🪵  Hybrid               Yes                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ──────────╮  ╭────── Statistics ──────╮ 
+   │  📡 IP      192.168.1.2    │  │  🔄 Starts   2         │ 
+   │  📶 WiFi    -60 dBm (80%)  │  │  🔥 Heating  1h        │ 
+   │  🌡️  WiRCU  27.0°          │  │  ⏱️  Uptime  24h       │ 
+   │  📋 Params  v15            │  │  🔧 Service  in 2159h  │ 
+   ╰────────────────────────────╯  ╰────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_command
+  '''
+  
+    🏭 Fumis WiRCU
+    ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                ⭘  Off                  │
+  │   🌡️  Temperature          19.9° → 21.8°           │
+  │   💨 Exhaust               23°                     │
+  │   ⚡ Power                 0.0 kW (level 2)        │
+  │   ⛽ Fuel                  ░░░░░░░░░░ 0%           │
+  │   ⭘  Eco mode              Off                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ─────────╮  ╭───── Statistics ─────╮ 
+   │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
+   │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
+   ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
+                                  │  🔧 Service  in -1h  │ 
+                                  ╰──────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_command_json
+  '''
+  {
+    "unit": {
+      "id": "**REDACTED**",
+      "type": 0,
+      "version": "2.0.0",
+      "rssi": "-48",
+      "ip": "192.168.1.2"
+    },
+    "controller": {
+      "type": 0,
+      "version": "1.7.0",
+      "command": 1,
+      "status": 0,
+      "error": 0,
+      "alert": 0,
+      "heating_slope": 0.0,
+      "current_time": 1574360658,
+      "timer_enable": false,
+      "fuel_type": 1,
+      "time_to_service": "-1",
+      "power": {
+        "kw": 0.0,
+        "actual_power": 0,
+        "set_power": 2,
+        "set_type": 1,
+        "actual_type": 1
+      },
+      "statistic": {
+        "igniter_starts": 392,
+        "uptime": 58184580,
+        "heating_time": 1823340,
+        "service_time": 1823340,
+        "overheatings": 0,
+        "misfires": 0,
+        "fuel_quantity_used": 0
+      },
+      "diagnostic": {
+        "variables": [
+          {
+            "id": 0,
+            "value": 2
+          },
+          {
+            "id": 1,
+            "value": 17418
+          },
+          {
+            "id": 2,
+            "value": 513
+          },
+          {
+            "id": 3,
+            "value": 0
+          },
+          {
+            "id": 4,
+            "value": 0
+          },
+          {
+            "id": 5,
+            "value": 2
+          },
+          {
+            "id": 6,
+            "value": 0
+          },
+          {
+            "id": 7,
+            "value": 0
+          },
+          {
+            "id": 8,
+            "value": 0
+          },
+          {
+            "id": 9,
+            "value": 0
+          },
+          {
+            "id": 10,
+            "value": 0
+          },
+          {
+            "id": 11,
+            "value": 23
+          },
+          {
+            "id": 12,
+            "value": 0
+          },
+          {
+            "id": 13,
+            "value": 392
+          },
+          {
+            "id": 14,
+            "value": 23
+          },
+          {
+            "id": 15,
+            "value": 16162
+          },
+          {
+            "id": 16,
+            "value": 29
+          },
+          {
+            "id": 17,
+            "value": 506
+          },
+          {
+            "id": 18,
+            "value": 29
+          },
+          {
+            "id": 19,
+            "value": 506
+          },
+          {
+            "id": 20,
+            "value": 0
+          },
+          {
+            "id": 21,
+            "value": 0
+          },
+          {
+            "id": 22,
+            "value": 199
+          },
+          {
+            "id": 23,
+            "value": 1
+          },
+          {
+            "id": 24,
+            "value": 24
+          },
+          {
+            "id": 25,
+            "value": 19
+          },
+          {
+            "id": 26,
+            "value": 4
+          }
+        ],
+        "parameters": [
+          {
+            "id": 0,
+            "value": 22
+          },
+          {
+            "id": 1,
+            "value": 5
+          },
+          {
+            "id": 2,
+            "value": 0
+          },
+          {
+            "id": 3,
+            "value": 255
+          },
+          {
+            "id": 4,
+            "value": 1
+          },
+          {
+            "id": 5,
+            "value": 100
+          },
+          {
+            "id": 6,
+            "value": 29
+          },
+          {
+            "id": 7,
+            "value": 60
+          },
+          {
+            "id": 8,
+            "value": 20
+          },
+          {
+            "id": 9,
+            "value": 1
+          },
+          {
+            "id": 10,
+            "value": 16
+          },
+          {
+            "id": 11,
+            "value": 1
+          },
+          {
+            "id": 12,
+            "value": 1
+          },
+          {
+            "id": 13,
+            "value": 1
+          },
+          {
+            "id": 14,
+            "value": 1
+          },
+          {
+            "id": 15,
+            "value": 1
+          },
+          {
+            "id": 16,
+            "value": 1
+          },
+          {
+            "id": 17,
+            "value": 1
+          },
+          {
+            "id": 18,
+            "value": 38
+          },
+          {
+            "id": 19,
+            "value": 206
+          },
+          {
+            "id": 20,
+            "value": 20
+          },
+          {
+            "id": 21,
+            "value": 96
+          },
+          {
+            "id": 22,
+            "value": 25
+          },
+          {
+            "id": 23,
+            "value": 17
+          },
+          {
+            "id": 24,
+            "value": 15
+          },
+          {
+            "id": 25,
+            "value": 0
+          },
+          {
+            "id": 26,
+            "value": 0
+          },
+          {
+            "id": 27,
+            "value": 0
+          },
+          {
+            "id": 28,
+            "value": 39
+          },
+          {
+            "id": 29,
+            "value": 140
+          },
+          {
+            "id": 30,
+            "value": 230
+          },
+          {
+            "id": 31,
+            "value": 140
+          },
+          {
+            "id": 32,
+            "value": 140
+          },
+          {
+            "id": 33,
+            "value": 190
+          },
+          {
+            "id": 34,
+            "value": 140
+          },
+          {
+            "id": 35,
+            "value": 150
+          },
+          {
+            "id": 36,
+            "value": 170
+          },
+          {
+            "id": 37,
+            "value": 190
+          },
+          {
+            "id": 38,
+            "value": 220
+          },
+          {
+            "id": 39,
+            "value": 240
+          },
+          {
+            "id": 40,
+            "value": 0
+          },
+          {
+            "id": 41,
+            "value": 0
+          },
+          {
+            "id": 42,
+            "value": 0
+          },
+          {
+            "id": 43,
+            "value": 0
+          },
+          {
+            "id": 44,
+            "value": 0
+          },
+          {
+            "id": 45,
+            "value": 110
+          },
+          {
+            "id": 46,
+            "value": 120
+          },
+          {
+            "id": 47,
+            "value": 140
+          },
+          {
+            "id": 48,
+            "value": 160
+          },
+          {
+            "id": 49,
+            "value": 180
+          },
+          {
+            "id": 50,
+            "value": 5
+          },
+          {
+            "id": 51,
+            "value": 109
+          },
+          {
+            "id": 52,
+            "value": 0
+          },
+          {
+            "id": 53,
+            "value": 0
+          },
+          {
+            "id": 54,
+            "value": 65
+          },
+          {
+            "id": 55,
+            "value": 150
+          },
+          {
+            "id": 56,
+            "value": 65
+          },
+          {
+            "id": 57,
+            "value": 160
+          },
+          {
+            "id": 58,
+            "value": 68
+          },
+          {
+            "id": 59,
+            "value": 50
+          },
+          {
+            "id": 60,
+            "value": 30
+          },
+          {
+            "id": 61,
+            "value": 30
+          },
+          {
+            "id": 62,
+            "value": 14
+          },
+          {
+            "id": 63,
+            "value": 90
+          },
+          {
+            "id": 64,
+            "value": 30
+          },
+          {
+            "id": 65,
+            "value": 60
+          },
+          {
+            "id": 66,
+            "value": 30
+          },
+          {
+            "id": 67,
+            "value": 0
+          },
+          {
+            "id": 68,
+            "value": 0
+          },
+          {
+            "id": 69,
+            "value": 0
+          },
+          {
+            "id": 70,
+            "value": 30
+          },
+          {
+            "id": 71,
+            "value": 6
+          },
+          {
+            "id": 72,
+            "value": 2
+          },
+          {
+            "id": 73,
+            "value": 100
+          },
+          {
+            "id": 74,
+            "value": 90
+          },
+          {
+            "id": 75,
+            "value": 100
+          },
+          {
+            "id": 76,
+            "value": 1
+          },
+          {
+            "id": 77,
+            "value": 70
+          },
+          {
+            "id": 78,
+            "value": 0
+          },
+          {
+            "id": 79,
+            "value": 0
+          },
+          {
+            "id": 80,
+            "value": 0
+          },
+          {
+            "id": 81,
+            "value": 0
+          },
+          {
+            "id": 82,
+            "value": 0
+          },
+          {
+            "id": 83,
+            "value": 0
+          },
+          {
+            "id": 84,
+            "value": 0
+          },
+          {
+            "id": 85,
+            "value": 0
+          },
+          {
+            "id": 86,
+            "value": 0
+          },
+          {
+            "id": 87,
+            "value": 0
+          },
+          {
+            "id": 88,
+            "value": 0
+          },
+          {
+            "id": 89,
+            "value": 0
+          },
+          {
+            "id": 90,
+            "value": 0
+          },
+          {
+            "id": 91,
+            "value": 0
+          },
+          {
+            "id": 92,
+            "value": 1
+          },
+          {
+            "id": 93,
+            "value": 1
+          },
+          {
+            "id": 94,
+            "value": 0
+          },
+          {
+            "id": 95,
+            "value": 0
+          },
+          {
+            "id": 96,
+            "value": 0
+          },
+          {
+            "id": 97,
+            "value": 0
+          },
+          {
+            "id": 98,
+            "value": 0
+          },
+          {
+            "id": 99,
+            "value": 0
+          },
+          {
+            "id": 100,
+            "value": 0
+          },
+          {
+            "id": 101,
+            "value": 180
+          },
+          {
+            "id": 102,
+            "value": 0
+          },
+          {
+            "id": 103,
+            "value": 0
+          },
+          {
+            "id": 104,
+            "value": 0
+          },
+          {
+            "id": 105,
+            "value": 45
+          }
+        ],
+        "timers": [
+          {
+            "id": 0,
+            "value": 7
+          },
+          {
+            "id": 1,
+            "value": 0
+          },
+          {
+            "id": 2,
+            "value": 23
+          },
+          {
+            "id": 3,
+            "value": 0
+          },
+          {
+            "id": 4,
+            "value": 7
+          },
+          {
+            "id": 5,
+            "value": 0
+          },
+          {
+            "id": 6,
+            "value": 9
+          },
+          {
+            "id": 7,
+            "value": 0
+          },
+          {
+            "id": 8,
+            "value": 17
+          },
+          {
+            "id": 9,
+            "value": 0
+          },
+          {
+            "id": 10,
+            "value": 23
+          },
+          {
+            "id": 11,
+            "value": 0
+          },
+          {
+            "id": 12,
+            "value": 8
+          },
+          {
+            "id": 13,
+            "value": 30
+          },
+          {
+            "id": 14,
+            "value": 0
+          },
+          {
+            "id": 15,
+            "value": 0
+          },
+          {
+            "id": 16,
+            "value": 1
+          },
+          {
+            "id": 17,
+            "value": 0
+          },
+          {
+            "id": 18,
+            "value": 1
+          },
+          {
+            "id": 19,
+            "value": 0
+          },
+          {
+            "id": 20,
+            "value": 2
+          },
+          {
+            "id": 21,
+            "value": 3
+          },
+          {
+            "id": 22,
+            "value": 2
+          },
+          {
+            "id": 23,
+            "value": 3
+          },
+          {
+            "id": 24,
+            "value": 1
+          },
+          {
+            "id": 25,
+            "value": 0
+          },
+          {
+            "id": 26,
+            "value": 4
+          },
+          {
+            "id": 27,
+            "value": 0
+          },
+          {
+            "id": 28,
+            "value": 4
+          },
+          {
+            "id": 29,
+            "value": 0
+          },
+          {
+            "id": 30,
+            "value": 0
+          },
+          {
+            "id": 31,
+            "value": 0
+          },
+          {
+            "id": 32,
+            "value": 0
+          },
+          {
+            "id": 33,
+            "value": 0
+          },
+          {
+            "id": 34,
+            "value": 0
+          },
+          {
+            "id": 35,
+            "value": 0
+          },
+          {
+            "id": 36,
+            "value": 0
+          },
+          {
+            "id": 37,
+            "value": 0
+          },
+          {
+            "id": 38,
+            "value": 0
+          },
+          {
+            "id": 39,
+            "value": 0
+          },
+          {
+            "id": 40,
+            "value": 0
+          },
+          {
+            "id": 41,
+            "value": 0
+          },
+          {
+            "id": 42,
+            "value": 0
+          },
+          {
+            "id": 43,
+            "value": 0
+          },
+          {
+            "id": 44,
+            "value": 0
+          }
+        ]
+      },
+      "eco_mode": {},
+      "antifreeze": {},
+      "fans": [
+        {
+          "id": 1,
+          "speed": 1,
+          "speed_type": 6,
+          "weight": 0
+        }
+      ],
+      "temperatures": [
+        {
+          "id": 1,
+          "actual": 19.9,
+          "setpoint": 21.8,
+          "on_main_screen": true,
+          "actual_type": 1,
+          "set_type": 2,
+          "weight": 0
+        },
+        {
+          "id": 3,
+          "actual": 0.0,
+          "setpoint": 0.0,
+          "on_main_screen": false,
+          "actual_type": 0,
+          "set_type": 0,
+          "weight": 0
+        },
+        {
+          "id": 4,
+          "actual": 0.0,
+          "setpoint": 0.0,
+          "on_main_screen": false,
+          "actual_type": 0,
+          "set_type": 0,
+          "weight": 0
+        },
+        {
+          "id": 5,
+          "actual": 0.0,
+          "setpoint": 0.0,
+          "on_main_screen": false,
+          "actual_type": 0,
+          "set_type": 0,
+          "weight": 0
+        },
+        {
+          "id": 6,
+          "actual": 0.0,
+          "setpoint": 0.0,
+          "on_main_screen": false,
+          "actual_type": 0,
+          "set_type": 0,
+          "weight": 0
+        },
+        {
+          "id": 2,
+          "actual": 0.0,
+          "setpoint": 0.0,
+          "on_main_screen": false,
+          "actual_type": 0,
+          "set_type": 0,
+          "weight": 0
+        }
+      ],
+      "fuels": [
+        {
+          "id": 1,
+          "quality": 1,
+          "quality_type": 3,
+          "quantity": 0.0,
+          "quantity_set_type": 0,
+          "quantity_actual_type": 0
+        }
+      ]
+    },
+    "api_version": "1.0"
+  }
+  
+  '''
+# ---
+# name: test_info_error_state
+  '''
+  
+    🏭 Austroflamm Clou Duo
+    ID: AABBCCDDEEFF • WiRCU 2.5.0 • Controller 2.6.0 • API 1.3
+  
+  ╭───────────────────────────────── Status ──────────────────────────────────╮
+  │   🏠 Status          ⭘  Off                                               │
+  │   ❌ Error           E102 Chimney/burning pot dirty or manually stopped   │
+  │   🌡️  Temperature    20.4° → 25.0°                                        │
+  │   🔥 Combustion      21.0°                                                │
+  │   💨 Exhaust         49°                                                  │
+  │   ⚡ Power           7.0 kW (level 5)                                     │
+  │   ⛽ Fuel            █████████░ 95%                                       │
+  │   🚪 Door            Closed                                               │
+  │   ⭘  Eco mode        Off                                                  │
+  │   ❄️  Antifreeze     On (5.0°)                                            │
+  │   🪵  Hybrid         Yes                                                  │
+  ╰───────────────────────────────────────────────────────────────────────────╯
+   ╭───────── Network ──────────╮  ╭────── Statistics ──────╮ 
+   │  📡 IP      192.168.1.2    │  │  🔄 Starts   1         │ 
+   │  📶 WiFi    -55 dBm (90%)  │  │  🔥 Heating  0h        │ 
+   │  🌡️  WiRCU  26.8°          │  │  ⏱️  Uptime  23h       │ 
+   │  📋 Params  v15            │  │  🔧 Service  in 2160h  │ 
+   ╰────────────────────────────╯  ╰────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_original_fixture
+  '''
+  
+    🏭 Fumis WiRCU
+    ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                ⭘  Off                  │
+  │   🌡️  Temperature          19.9° → 21.8°           │
+  │   💨 Exhaust               23°                     │
+  │   ⚡ Power                 0.0 kW (level 2)        │
+  │   ⛽ Fuel                  ░░░░░░░░░░ 0%           │
+  │   ⭘  Eco mode              Off                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ─────────╮  ╭───── Statistics ─────╮ 
+   │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
+   │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
+   ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
+                                  │  🔧 Service  in -1h  │ 
+                                  ╰──────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_pellet_stove
+  '''
+  
+    🏭 Unknown Pellet stove
+    ID: REDACTED • WiRCU 2.3.0 • Controller 1.4.0 • API 1.3
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                🔥  Combustion          │
+  │   🌡️  Temperature          18.9° → 10.0°           │
+  │   🔥 Combustion            256.0°                  │
+  │   ⚡ Power                 3.6 kW (level 5)        │
+  │   ⛽ Fuel                  ██████████ 100%         │
+  │   🚪 Door                  Closed                  │
+  │   ⭘  Eco mode              Off                     │
+  │   ⭘  Antifreeze            Off                     │
+  │   🪵  Hybrid               Yes                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭────────── Network ──────────╮  ╭────── Statistics ───────╮ 
+   │  📡 IP      192.168.1.100   │  │  🔄 Starts     240      │ 
+   │  📶 WiFi    -43 dBm (100%)  │  │  🔥 Heating    1156h    │ 
+   │  🌡️  WiRCU  26.5°           │  │  ⏱️  Uptime    3651h    │ 
+   │  📋 Params  v10             │  │  🔧 Service    in 404h  │ 
+   ╰─────────────────────────────╯  │  ⚠️  Misfires  1        │ 
+                                    ╰─────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_shutting_down_state
+  '''
+  
+    🏭 Austroflamm Clou Duo
+    ID: AABBCCDDEEFF • WiRCU 2.5.0 • Controller 2.6.0 • API 1.3
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status          ❄  Cooling (shutting down…)   │
+  │   🌡️  Temperature    20.7° → 25.0°                 │
+  │   🔥 Combustion      206.0°                        │
+  │   ⚡ Power           4.6 kW (level 5)              │
+  │   ⛽ Fuel            █████████░ 95%                │
+  │   🚪 Door            Closed                        │
+  │   ⭘  Eco mode        Off                           │
+  │   ❄️  Antifreeze     On (5.0°)                     │
+  │   🪵  Hybrid         Yes                           │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ──────────╮  ╭────── Statistics ──────╮ 
+   │  📡 IP      192.168.1.2    │  │  🔄 Starts   2         │ 
+   │  📶 WiFi    -60 dBm (80%)  │  │  🔥 Heating  1h        │ 
+   │  🌡️  WiRCU  27.0°          │  │  ⏱️  Uptime  24h       │ 
+   │  📋 Params  v15            │  │  🔧 Service  in 2159h  │ 
+   ╰────────────────────────────╯  ╰────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_starting_state
+  '''
+  
+    🏭 Fumis WiRCU
+    ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status               🧨 Off (starting…)       │
+  │   🌡️  Temperature         19.9° → 21.8°            │
+  │   💨 Exhaust              23°                      │
+  │   ⚡ Power                0.0 kW (level 2)         │
+  │   ⛽ Fuel                 ░░░░░░░░░░ 0%            │
+  │   ⭘  Eco mode             Off                      │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ─────────╮  ╭───── Statistics ─────╮ 
+   │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
+   │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
+   ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
+                                  │  🔧 Service  in -1h  │ 
+                                  ╰──────────────────────╯ 
+  
+  '''
+# ---
+# name: test_off_command
+  '''
+  ❄️  Stove turned off.
+  
+  '''
+# ---
+# name: test_on_command
+  '''
+  🔥 Stove turned on.
+  
+  '''
+# ---
+# name: test_power_command
+  '''
+  ⚡ Power level set to 3.
+  
+  '''
+# ---
+# name: test_stove_offline_error_handler
+  '''
+  ╭───────────────────────── Stove offline ─────────────────────────╮
+  │                                                                 │
+  │     The stove is not connected. The WiRCU module may be powered │
+  │     off or unable to reach the cloud. Please check the stove's  │
+  │     power and WiFi connection.                                  │
+  │                                                                 │
+  ╰─────────────────────────────────────────────────────────────────╯
+  
+  '''
+# ---
+# name: test_temperature_command
+  '''
+  🌡️  Target temperature set to 23.5° (zone 1).
+  
+  '''
+# ---
+# name: test_temperature_command_with_zone
+  '''
+  🌡️  Target temperature set to 25.0° (zone 3).
+  
+  '''
+# ---
