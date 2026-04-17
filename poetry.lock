@@ -2542,20 +2542,20 @@ syntax = ["tree-sitter (>=0.23.0) ; python_version >= \"3.9\"", "tree-sitter-bas
 
 [[package]]
 name = "textual-plotext"
-version = "0.2.1"
+version = "1.0.1"
 description = "A Textual widget wrapper for the Plotext plotting library"
 optional = true
-python-versions = ">=3.7.2,<4.0"
+python-versions = "<4.0.0,>=3.8.1"
 groups = ["main"]
 markers = "python_version < \"4.0\" and extra == \"cli\""
 files = [
-    {file = "textual_plotext-0.2.1-py3-none-any.whl", hash = "sha256:a1055cf50fac9af11f56b5ff73442570eb5fd051e513b20aeb8b15a6a2abfcff"},
-    {file = "textual_plotext-0.2.1.tar.gz", hash = "sha256:bc6f2d75d8e20dda6321f8254dc3decda8f41f60e6e70a3ddd83b652b890c081"},
+    {file = "textual_plotext-1.0.1-py3-none-any.whl", hash = "sha256:6b6bfd00b29f121ddf216eaaf9bdac9d688ed72f40028484d279a10cbbb169ed"},
+    {file = "textual_plotext-1.0.1.tar.gz", hash = "sha256:836f53a3316756609e194129a35c2875638e7958c261f541e0a794f7c98011be"},
 ]
 
 [package.dependencies]
 plotext = ">=5.2.8,<6.0.0"
-textual = ">=0.40.0"
+textual = ">=0.86.2"
 
 [[package]]
 name = "tomlkit"
@@ -2887,4 +2887,4 @@ cli = ["rich", "textual", "textual-plotext", "typer"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "2593f54b069548d24a84099ed8bc4cabb87a507bdb818faca5399df124caec1a"
+content-hash = "24e7f9df1ae6f10f4a11355adfee9d1f9c992884cba2d0e686e3474b9ad464ba"
