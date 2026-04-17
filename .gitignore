@@ -88,8 +88,11 @@ docs/_build/
 venv/
 ENV/
 
-# mypy
-.mypy_cache/
+# ty
+.ty/
+
+# Ruff
+.ruff_cache/
 
 # Visual Studio Code
 .vscode
@@ -111,3 +114,12 @@ target/
 # Cookiecutter
 output/
 python_boilerplate/
+
+# Node
+node_modules/
+
+# Deepcode AI
+.dccache
+
+# Claude
+.claude/

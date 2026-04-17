@@ -1,29 +1,38 @@
 # Python: Asynchronous client for the Fumis WiRCU API
 
 [![GitHub Release][releases-shield]][releases]
+[![Python Versions][python-versions-shield]][pypi]
 ![Project Stage][project-stage-shield]
 ![Project Maintenance][maintenance-shield]
 [![License][license-shield]](LICENSE.md)
 
 [![Build Status][build-shield]][build]
 [![Code Coverage][codecov-shield]][codecov]
-[![Code Quality][code-quality-shield]][code-quality]
+[![OpenSSF Scorecard][scorecard-shield]][scorecard]
+[![Open in Dev Containers][devcontainer-shield]][devcontainer]
 
-[![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
+[![Sponsor Frenck via GitHub Sponsors][github-sponsors-shield]][github-sponsors]
 
-[![Support my work on Patreon][patreon-shield]][patreon]
+[![Support Frenck on Patreon][patreon-shield]][patreon]
 
 Asynchronous Python client for the Fumis WiRCU API.
 
 ## About
 
-This package allows you to control and monitor Fumis WiRCU devices
-programmatically. It is mainly created to allow third-party programs to automate
-the behavior of a Fumis WiRCU device.
+This package allows you to control and monitor Fumis WiRCU pellet stove
+devices programmatically. It is mainly created to allow third-party programs
+to automate the behavior of a Fumis WiRCU device.
 
 An excellent example of this might be Home Assistant, which allows you to write
-automations, to turn on your pallet stove on or off and set
-a target temperature.
+automations, to turn on your pellet stove and set a target temperature.
+
+Known compatible stove brands:
+
+- Austroflamm (Clou Duo, MO DUO, Polly 2.0)
+- Heta (Green 200)
+- HAAS+SOHN
+- Eco Spar (Auriga, Solara, Tukana, Karina, Nova)
+- Prity
 
 ## Installation
 
@@ -31,26 +40,232 @@ a target temperature.
 pip install fumis
 ```
 
+To install with the optional CLI:
+
+```bash
+pip install "fumis[cli]"
+```
+
+## CLI
+
+The optional CLI lets you control your stove directly from the terminal.
+The `--mac` and `--password` options can also be set via the `FUMIS_MAC`
+and `FUMIS_PASSWORD` environment variables.
+
+```bash
+# Set credentials once via environment variables
+export FUMIS_MAC=AABBCCDDEEFF
+export FUMIS_PASSWORD=1234
+
+# Launch the live TUI dashboard
+fumis
+
+# Show device information
+fumis info
+
+# Turn the stove on/off
+fumis on
+fumis off
+
+# Set target temperature
+fumis temperature 23.5
+
+# Set power level (1-5)
+fumis power 3
+
+# Enable/disable eco mode
+fumis eco true
+
+# Show weekly timer schedule / enable / disable
+fumis timer
+fumis timer true
+
+# Sync the stove's clock to your system time
+fumis sync-clock
+
+# Show service diagnostics (sensors, IO, temperature channels)
+fumis diagnostics
+
+# Dump raw API response as JSON
+fumis dump
+
+# Emit machine-readable JSON
+fumis info --json
+```
+
+The default command (no subcommand) launches a live TUI dashboard with
+real-time temperature graphs, status display, and keyboard controls for
+on/off, temperature, and power level.
+
 ## Usage
+
+The client is an async context manager; every API call is a coroutine:
 
 ```python
 import asyncio
 
-from fumis import Fumis
+from fumis import Fumis, StoveStatus
 
 
-async def main(loop):
+async def main() -> None:
     """Show example on controlling your Fumis WiRCU device."""
-    async with Fumis(mac="AABBCCDDEEFF", password="1234", loop=loop) as fumis:
+    async with Fumis(mac="AABBCCDDEEFF", password="1234") as fumis:
         info = await fumis.update_info()
-        print(info)
 
+        # Stove identity
+        print(info.controller.manufacturer)  # "Austroflamm"
+        print(info.controller.model_name)    # "Clou Duo"
+
+        # Status
+        print(info.controller.stove_status)  # StoveStatus.OFF
+        print(info.controller.on)            # False
+
+        # Temperatures
+        main_temp = info.controller.main_temperature
+        if main_temp:
+            print(f"Room: {main_temp.actual}° → {main_temp.setpoint}°")
+
+        # Combustion chamber
+        print(info.controller.combustion_chamber_temperature)
+
+        # Power
+        print(f"{info.controller.power.kw} kW (level {info.controller.power.set_power})")
+
+        # Door sensor
+        print(f"Door open: {info.controller.door_open}")
+
+        # Fuel level
+        fuel = info.controller.fuel()
+        if fuel:
+            print(f"Fuel: {fuel.quantity_percentage}%")
+
+        # Weekly timer schedule
+        schedule = info.controller.schedule
+        print(f"Timer: {'on' if info.controller.timer_enable else 'off'}")
+        for prog in schedule.programs:
+            if prog.active:
+                print(f"  {prog}")  # "21:00-22:10"
+        print(f"Active days: {schedule.active_days}")
+
+        # Control the stove
+        await fumis.turn_on()
         await fumis.set_target_temperature(23.0)
+        await fumis.set_power(3)
+        await fumis.set_eco_mode(enabled=True)
+        await fumis.set_timer(enabled=True)
+        await fumis.set_fan_speed(3)
+        await fumis.set_clock()
+        await fumis.turn_off()
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+    asyncio.run(main())
+```
+
+### Raw API access
+
+For diagnostics, debugging, or fixture capture (useful for Home Assistant
+diagnostic downloads):
+
+```python
+async with Fumis(mac="AABBCCDDEEFF", password="1234") as fumis:
+    # Get the raw, unprocessed JSON dict from the API
+    raw = await fumis.raw_status()
+    print(json.dumps(raw, indent=2))
+```
+
+### Accessing diagnostic data
+
+All diagnostic variables and parameters from the Fumis controller are
+accessible via the structured model:
+
+```python
+info = await fumis.update_info()
+c = info.controller
+
+# Convenience properties (return None if not available)
+c.exhaust_temperature     # Exhaust gas temp (var[11])
+c.fan1_speed              # Fan 1 speed (var[4])
+c.fan2_speed              # Fan 2 speed (var[12])
+c.f02                     # F02 sensor input (var[34])
+c.pressure                # Pressure sensor (var[35])
+c.door_open               # Door sensor (var[33]) - True/False/None
+c.stove_model             # Stove model ID (var[96])
+c.parameter_version       # Parameter version (var[97])
+c.backwater_temperature   # Backwater temp for hydronic stoves (var[22])
+
+# Raw diagnostic access (escape hatch)
+c.diagnostic.variable(42)   # Any variable by ID → int | None
+c.diagnostic.parameter(14)  # Any parameter by ID → int | None
+
+# All temperature channels
+for temp in c.temperatures:
+    print(f"  Channel {temp.id}: {temp.actual}° (on screen: {temp.on_main_screen})")
+
+# Iterate fans, fuels, etc.
+for fan in c.fans:
+    print(f"  Fan {fan.id}: speed {fan.speed}")
+```
+
+### Error handling
+
+The exception hierarchy allows catching at any granularity:
+
+```python
+from fumis import (
+    Fumis,
+    FumisAuthenticationError,
+    FumisConnectionError,
+    FumisConnectionTimeoutError,
+    FumisError,
+    FumisResponseError,
+    FumisStoveOfflineError,
+)
+
+try:
+    async with Fumis(mac="AABBCCDDEEFF", password="1234") as fumis:
+        await fumis.turn_on()
+except FumisAuthenticationError:
+    # Invalid MAC address or PIN (HTTP 401)
+    ...
+except FumisStoveOfflineError:
+    # WiRCU not connected to cloud (HTTP 404)
+    ...
+except FumisConnectionTimeoutError:
+    # Request timed out
+    ...
+except FumisConnectionError:
+    # Any connectivity issue (timeout, DNS, HTTP error)
+    ...
+except FumisError:
+    # Any Fumis-specific error
+    ...
+```
+
+Exception hierarchy:
+
+```
+FumisError
+├── FumisConnectionError
+│   └── FumisConnectionTimeoutError
+├── FumisResponseError
+├── FumisAuthenticationError
+└── FumisStoveOfflineError
+```
+
+### Enums
+
+Status codes use proper Python enums, booleans where they make sense:
+
+```python
+from fumis import StoveStatus
+
+info.controller.stove_status == StoveStatus.COMBUSTION  # True
+info.controller.on                                      # True
+info.controller.eco_mode.enabled                        # False
+
+# Unknown values from the API are handled gracefully
+StoveStatus(999)  # StoveStatus.UNKNOWN (never crashes)
 ```
 
 ## Changelog & Releases
@@ -60,12 +275,12 @@ functionality. The format of the log is based on
 [Keep a Changelog][keepchangelog].
 
 Releases are based on [Semantic Versioning][semver], and use the format
-of ``MAJOR.MINOR.PATCH``. In a nutshell, the version will be incremented
+of `MAJOR.MINOR.PATCH`. In a nutshell, the version will be incremented
 based on the following:
 
-- ``MAJOR``: Incompatible or major changes.
-- ``MINOR``: Backwards-compatible new features and enhancements.
-- ``PATCH``: Backwards-compatible bugfixes and package updates.
+- `MAJOR`: Incompatible or major changes.
+- `MINOR`: Backwards-compatible new features and enhancements.
+- `PATCH`: Backwards-compatible bugfixes and package updates.
 
 ## Contributing
 
@@ -75,47 +290,47 @@ use the code or contribute to it.
 We've set up a separate document for our
 [contribution guidelines](CONTRIBUTING.md).
 
+For in-depth API documentation and reverse engineering notes, see
+[RESEARCH.md](RESEARCH.md).
+
 Thank you for being involved! :heart_eyes:
 
 ## Setting up development environment
 
-In case you'd like to contribute, a `Makefile` has been included to ensure a
-quick start.
+The easiest way to start, is by opening a CodeSpace here on GitHub, or by using
+the [Dev Container][devcontainer] feature of Visual Studio Code.
+
+[![Open in Dev Containers][devcontainer-shield]][devcontainer]
+
+This Python project is fully managed using the [Poetry][poetry] dependency
+manager. But also relies on the use of NodeJS for certain checks during
+development.
+
+You need at least:
+
+- Python 3.11+
+- [Poetry][poetry-install]
+- NodeJS 24+ (including NPM)
+
+To install all packages, including all development requirements:
 
 ```bash
-make venv
-source ./venv/bin/activate
-make dev
+npm install
+poetry install
 ```
 
-Now you can start developing, run `make` without arguments to get an overview
-of all make goals that are available (including description):
+As this repository uses the [prek][prek] framework, all changes
+are linted and tested with each commit. You can run all checks and tests
+manually, using the following command:
 
 ```bash
-$ make
-Asynchronous Python client for the Fumis WiRCU API.
+poetry run prek run --all-files
+```
 
-Usage:
-  make help                            Shows this message.
-  make dev                             Set up a development environment.
-  make lint                            Run all linters.
-  make lint-black                      Run linting using black & blacken-docs.
-  make lint-flake8                     Run linting using flake8 (pycodestyle/pydocstyle).
-  make lint-pylint                     Run linting using PyLint.
-  make lint-mypy                       Run linting using MyPy.
-  make test                            Run tests quickly with the default Python.
-  make coverage                        Check code coverage quickly with the default Python.
-  make install                         Install the package to the active Python's site-packages.
-  make clean                           Removes build, test, coverage and Python artifacts.
-  make clean-all                       Removes all venv, build, test, coverage and Python artifacts.
-  make clean-build                     Removes build artifacts.
-  make clean-pyc                       Removes Python file artifacts.
-  make clean-test                      Removes test and coverage artifacts.
-  make clean-venv                      Removes Python virtual environment artifacts.
-  make dist                            Builds source and wheel package.
-  make release                         Release build on PyP
-  make tox                             Run tests on every Python version with tox.
-  make venv                            Create Python venv environment.
+To run just the Python tests:
+
+```bash
+poetry run pytest
 ```
 
 ## Authors & contributors
@@ -129,7 +344,7 @@ check [the contributor's page][contributors].
 
 MIT License
 
-Copyright (c) 2019 Franck Nijhof
+Copyright (c) 2019-2026 Franck Nijhof
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -149,22 +364,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-[build-shield]: https://github.com/frenck/python-fumis/workflows/Continuous%20Integration/badge.svg
-[build]: https://github.com/frenck/python-fumis/actions
-[buymeacoffee-shield]: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
-[buymeacoffee]: https://www.buymeacoffee.com/frenck
-[code-quality-shield]: https://img.shields.io/lgtm/grade/python/g/frenck/python-fumis.svg?logo=lgtm&logoWidth=18
-[code-quality]: https://lgtm.com/projects/g/frenck/python-fumis/context:python
-[codecov-shield]: https://codecov.io/gh/frenck/python-fumis/branch/master/graph/badge.svg
+[build-shield]: https://github.com/frenck/python-fumis/actions/workflows/tests.yaml/badge.svg
+[build]: https://github.com/frenck/python-fumis/actions/workflows/tests.yaml
+[codecov-shield]: https://codecov.io/gh/frenck/python-fumis/branch/main/graph/badge.svg
 [codecov]: https://codecov.io/gh/frenck/python-fumis
 [contributors]: https://github.com/frenck/python-fumis/graphs/contributors
+[devcontainer-shield]: https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode
+[devcontainer]: https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/frenck/python-fumis
 [frenck]: https://github.com/frenck
+[github-sponsors-shield]: https://frenck.dev/wp-content/uploads/2019/12/github_sponsor.png
+[github-sponsors]: https://github.com/sponsors/frenck
 [keepchangelog]: http://keepachangelog.com/en/1.0.0/
 [license-shield]: https://img.shields.io/github/license/frenck/python-fumis.svg
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2019.svg
-[patreon-shield]: https://www.frenck.nl/images/patreon.png
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg
+[patreon-shield]: https://frenck.dev/wp-content/uploads/2019/12/patreon.png
 [patreon]: https://www.patreon.com/frenck
+[poetry-install]: https://python-poetry.org/docs/#installation
+[poetry]: https://python-poetry.org
+[prek]: https://github.com/frenck/prek
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
+[pypi]: https://pypi.org/project/fumis/
+[python-versions-shield]: https://img.shields.io/pypi/pyversions/fumis
 [releases-shield]: https://img.shields.io/github/release/frenck/python-fumis.svg
 [releases]: https://github.com/frenck/python-fumis/releases
+[scorecard]: https://scorecard.dev/viewer/?uri=github.com/frenck/python-fumis
+[scorecard-shield]: https://api.scorecard.dev/projects/github.com/frenck/python-fumis/badge
 [semver]: http://semver.org/spec/v2.0.0.html

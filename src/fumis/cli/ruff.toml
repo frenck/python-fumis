@@ -1,0 +1,7 @@
+# Ruff rules for the CLI module
+extend = "../../../pyproject.toml"
+
+lint.extend-ignore = [
+  "FBT001", # Boolean positional argument is fine for CLI callbacks
+  "I001", # Import sorting conflicts with deferred imports in CLI
+]
