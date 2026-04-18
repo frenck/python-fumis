@@ -19,7 +19,7 @@ from fumis.exceptions import (
     FumisConnectionError,
     FumisStoveOfflineError,
 )
-from fumis.models import Info
+from fumis.models import FumisInfo
 
 if TYPE_CHECKING:
     from syrupy.assertion import SnapshotAssertion
@@ -49,7 +49,7 @@ def runner() -> CliRunner:
 def _mock_fumis(fixture_name: str) -> MagicMock:
     """Create a mock Fumis client that returns data from a fixture."""
     fixture_data = _load_fixture(fixture_name)
-    info = Info.from_dict(fixture_data)
+    info = FumisInfo.from_dict(fixture_data)
 
     client = AsyncMock()
     client.update_info.return_value = info

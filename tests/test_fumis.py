@@ -15,9 +15,9 @@ from fumis import (
     FumisConnectionError,
     FumisConnectionTimeoutError,
     FumisError,
+    FumisInfo,
     FumisResponseError,
     FumisStoveOfflineError,
-    Info,
     StoveState,
     StoveStatus,
 )
@@ -359,14 +359,14 @@ async def test_original_fixture_fields(responses: aioresponses, fumis: Fumis) ->
     )
     info = await fumis.update_info()
 
-    # Unit
+    # FumisUnit
     assert info.unit.id == "AABBCCDDEEFF"
     assert info.unit.version == "2.0.0"
     assert info.unit.rssi == -48
     assert info.unit.signal_strength == 100
     assert info.unit.temperature is None
 
-    # Controller
+    # FumisController
     assert info.controller.stove_status == StoveStatus.OFF
     assert info.controller.on is False
     assert info.controller.alert == 0
@@ -399,7 +399,7 @@ async def test_clou_duo_hybrid_fields(responses: aioresponses, fumis: Fumis) -> 
     assert info.controller.hybrid is not None
     assert info.controller.hybrid.actual_type == 1
 
-    # Controller status: pre-heating
+    # FumisController status: pre-heating
     assert info.controller.status == 10
     assert info.controller.stove_status == StoveStatus.PRE_HEATING
     assert info.controller.on is True
@@ -426,7 +426,7 @@ async def test_clou_duo_hybrid_fields(responses: aioresponses, fumis: Fumis) -> 
     # 9 temperature channels on this stove
     assert len(info.controller.temperatures) == 9
 
-    # Fuel quantity
+    # FumisFuel quantity
     fuel = info.controller.fuel()
     assert fuel is not None
     assert fuel.quantity == 0.27
@@ -445,14 +445,14 @@ async def test_pellet_stove_unknown_fields(
     )
     info = await fumis.update_info()
 
-    # Controller status: combustion (actively burning)
+    # FumisController status: combustion (actively burning)
     assert info.controller.status == 30
     assert info.controller.stove_status == StoveStatus.COMBUSTION
 
     # Has unit temperature (WiRCU box temp)
     assert info.unit.temperature == 26.5
 
-    # Hybrid is present but inactive
+    # FumisHybrid is present but inactive
     assert info.controller.hybrid is not None
     assert info.controller.hybrid.actual_type == 0
 
@@ -460,7 +460,7 @@ async def test_pellet_stove_unknown_fields(
     assert info.controller.f02 == 1347
     assert info.controller.pressure == 608
 
-    # Power during combustion
+    # FumisPower during combustion
     assert info.controller.power.set_power == 5
     assert info.controller.power.actual_power == 1
     assert info.controller.power.kw == 3.6
@@ -500,43 +500,43 @@ async def test_signal_strength_zero(responses: aioresponses, fumis: Fumis) -> No
 
 def test_controller_fan_not_found() -> None:
     """Test fan lookup returns None for missing fan ID."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.fan(99) is None
 
 
 def test_controller_fuel_not_found() -> None:
     """Test fuel lookup returns None for missing fuel ID."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.fuel(99) is None
 
 
 def test_controller_temperature_channel_not_found() -> None:
     """Test temperature channel lookup returns None for missing ID."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.temperature_channel(99) is None
 
 
 def test_controller_main_temperature_empty() -> None:
     """Test main temperature returns None when no temperatures exist."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.main_temperature is None
 
 
 def test_diagnostic_variable_missing() -> None:
     """Test diagnostic variable lookup returns None for missing ID."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.diagnostic.variable(999) is None
 
 
 def test_diagnostic_parameter_missing() -> None:
     """Test diagnostic parameter lookup returns None for missing ID."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.diagnostic.parameter(999) is None
 
 
 def test_fuel_quantity_percentage_none() -> None:
     """Test fuel quantity percentage when quantity is None."""
-    info = Info.from_dict({"controller": {"fuels": [{"id": 1}]}})
+    info = FumisInfo.from_dict({"controller": {"fuels": [{"id": 1}]}})
     fuel = info.controller.fuel()
     assert fuel is not None
     assert fuel.quantity_percentage is None
@@ -544,7 +544,7 @@ def test_fuel_quantity_percentage_none() -> None:
 
 def test_convenience_properties_none_when_empty() -> None:
     """Test convenience properties return None when no diagnostics exist."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.exhaust_temperature is None
     assert info.controller.door_open is None
     assert info.controller.fan1_speed is None
@@ -562,7 +562,7 @@ def test_convenience_properties_none_when_empty() -> None:
 
 def test_unknown_stove_model() -> None:
     """Test unknown stove model returns None for model_info."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {
             "controller": {
                 "diagnostic": {
@@ -582,7 +582,7 @@ def test_unknown_stove_model() -> None:
 
 def test_door_open_property() -> None:
     """Test door_open returns True when IO4 is 0 (open)."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"diagnostic": {"variables": [{"id": 33, "value": 0}]}}}
     )
     assert info.controller.door_open is True
@@ -590,7 +590,7 @@ def test_door_open_property() -> None:
 
 def test_door_closed_property() -> None:
     """Test door_open returns False when IO4 is 1 (closed)."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"diagnostic": {"variables": [{"id": 33, "value": 1}]}}}
     )
     assert info.controller.door_open is False
@@ -598,7 +598,7 @@ def test_door_closed_property() -> None:
 
 def test_exhaust_temperature_property() -> None:
     """Test exhaust_temperature reads from var[11] (VARIABLE_GASSES_TEMPERATURE)."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"diagnostic": {"variables": [{"id": 11, "value": 95}]}}}
     )
     assert info.controller.exhaust_temperature == 95
@@ -606,7 +606,7 @@ def test_exhaust_temperature_property() -> None:
 
 def test_fan1_speed_property() -> None:
     """Test fan1_speed reads from var[4] (VARIABLE_FAN_1_SPEED)."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"diagnostic": {"variables": [{"id": 4, "value": 1200}]}}}
     )
     assert info.controller.fan1_speed == 1200
@@ -614,22 +614,22 @@ def test_fan1_speed_property() -> None:
 
 def test_unknown_status_code() -> None:
     """Test unknown status code returns StoveStatus.UNKNOWN."""
-    info = Info.from_dict({"controller": {"status": 999}})
+    info = FumisInfo.from_dict({"controller": {"status": 999}})
     assert info.controller.stove_status == StoveStatus.UNKNOWN
 
 
 def test_on_based_on_status() -> None:
     """Test on property is based on status, not command."""
     # Status OFF = not on, regardless of command
-    info = Info.from_dict({"controller": {"status": 0, "command": 2}})
+    info = FumisInfo.from_dict({"controller": {"status": 0, "command": 2}})
     assert info.controller.on is False
 
     # Status COMBUSTION = on, even with command=1 (normal after ack)
-    info = Info.from_dict({"controller": {"status": 30, "command": 1}})
+    info = FumisInfo.from_dict({"controller": {"status": 30, "command": 1}})
     assert info.controller.on is True
 
     # Unknown status = not on
-    info = Info.from_dict({"controller": {"status": 999}})
+    info = FumisInfo.from_dict({"controller": {"status": 999}})
     assert info.controller.on is False
 
 
@@ -655,7 +655,7 @@ def test_on_based_on_status() -> None:
 )
 def test_stove_state(status_code: int, expected_state: StoveState) -> None:
     """Test simplified state derived from raw status for all mappings."""
-    info = Info.from_dict({"controller": {"status": status_code}})
+    info = FumisInfo.from_dict({"controller": {"status": status_code}})
     assert info.controller.state == expected_state
 
 
@@ -666,13 +666,13 @@ def test_stove_state_is_str_enum() -> None:
 
 def test_eco_mode_enabled() -> None:
     """Test eco mode enabled/disabled detection."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"ecoMode": {"ecoModeEnable": 1, "ecoModeSetType": 1}}}
     )
     assert info.controller.eco_mode is not None
     assert info.controller.eco_mode.enabled is True
 
-    info2 = Info.from_dict(
+    info2 = FumisInfo.from_dict(
         {"controller": {"ecoMode": {"ecoModeEnable": 0, "ecoModeSetType": 1}}}
     )
     assert info2.controller.eco_mode is not None
@@ -681,13 +681,13 @@ def test_eco_mode_enabled() -> None:
 
 def test_eco_mode_not_enabled() -> None:
     """Test eco mode defaults to disabled."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     assert info.controller.eco_mode is None
 
 
 def test_combustion_chamber_temp_from_channel() -> None:
     """Test combustion chamber temp from temperature channel 7."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {
             "controller": {
                 "temperatures": [
@@ -858,7 +858,7 @@ async def test_set_fuel_quantity_display(responses: aioresponses, fumis: Fumis) 
 
 def test_schedule_from_timers() -> None:
     """Test parsing the weekly schedule from diagnostic timers."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {
             "controller": {
                 "timerEnable": True,
@@ -905,7 +905,7 @@ def test_schedule_from_timers() -> None:
 
 def test_schedule_empty() -> None:
     """Test schedule with no timers set."""
-    info = Info.from_dict({})
+    info = FumisInfo.from_dict({})
     schedule = info.controller.schedule
     assert all(not p.active for p in schedule.programs)
     assert schedule.active_days == []
@@ -928,7 +928,7 @@ async def test_raw_status(responses: aioresponses, fumis: Fumis) -> None:
 
 def test_eco_mode_unexpected_value() -> None:
     """Test eco mode treats unexpected values as disabled."""
-    info = Info.from_dict(
+    info = FumisInfo.from_dict(
         {"controller": {"ecoMode": {"ecoModeEnable": 99, "ecoModeSetType": 1}}}
     )
     assert info.controller.eco_mode is not None

@@ -20,7 +20,7 @@ from fumis.const import StoveStatus
 from fumis.fumis import Fumis
 
 if TYPE_CHECKING:
-    from fumis.models import Info
+    from fumis.models import FumisInfo
 
 POLL_INTERVAL = 30
 MAX_HISTORY = 120
@@ -41,7 +41,7 @@ STATUS_ICONS: dict[StoveStatus, str] = {
 class StatusWidget(Static):
     """Displays the current stove status."""
 
-    def update_info(self, info: Info) -> None:
+    def update_info(self, info: FumisInfo) -> None:
         """Update the display with new info."""
         c = info.controller
         status = c.stove_status
@@ -103,7 +103,7 @@ class StatusWidget(Static):
 class InfoWidget(Static):
     """Displays device info and network stats."""
 
-    def update_info(self, info: Info) -> None:
+    def update_info(self, info: FumisInfo) -> None:
         """Update the display with new info."""
         c = info.controller
         u = info.unit
@@ -366,7 +366,7 @@ class FumisTuiApp(App[None]):
         super().__init__()
         self.mac = mac
         self.password = password
-        self._info: Info | None = None
+        self._info: FumisInfo | None = None
         self._room_history: deque[float] = deque(maxlen=MAX_HISTORY)
         self._target_history: deque[float] = deque(maxlen=MAX_HISTORY)
         self._combustion_history: deque[float] = deque(maxlen=MAX_HISTORY)
