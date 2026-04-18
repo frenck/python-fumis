@@ -18,6 +18,7 @@ from fumis import (
     FumisResponseError,
     FumisStoveOfflineError,
     Info,
+    StoveState,
     StoveStatus,
 )
 
@@ -630,6 +631,46 @@ def test_on_based_on_status() -> None:
     # Unknown status = not on
     info = Info.from_dict({"controller": {"status": 999}})
     assert info.controller.on is False
+
+
+def test_stove_state() -> None:
+    """Test simplified state derived from raw status."""
+    # OFF statuses map to OFF state
+    info = Info.from_dict({"controller": {"status": 0}})
+    assert info.controller.state == StoveState.OFF
+
+    # PRE_HEATING maps to HEATING_UP
+    info = Info.from_dict({"controller": {"status": 10}})
+    assert info.controller.state == StoveState.HEATING_UP
+
+    # IGNITION and PRE_COMBUSTION map to IGNITION
+    info = Info.from_dict({"controller": {"status": 20}})
+    assert info.controller.state == StoveState.IGNITION
+    info = Info.from_dict({"controller": {"status": 21}})
+    assert info.controller.state == StoveState.IGNITION
+
+    # COMBUSTION maps to BURNING
+    info = Info.from_dict({"controller": {"status": 30}})
+    assert info.controller.state == StoveState.BURNING
+
+    # ECO maps to ECO
+    info = Info.from_dict({"controller": {"status": 40}})
+    assert info.controller.state == StoveState.ECO
+
+    # COOLING maps to COOLING
+    info = Info.from_dict({"controller": {"status": 50}})
+    assert info.controller.state == StoveState.COOLING
+
+    # WOOD_COMBUSTION maps to BURNING
+    info = Info.from_dict({"controller": {"status": 110}})
+    assert info.controller.state == StoveState.BURNING
+
+    # Unknown maps to UNKNOWN
+    info = Info.from_dict({"controller": {"status": 999}})
+    assert info.controller.state == StoveState.UNKNOWN
+
+    # StrEnum serializes cleanly
+    assert str(StoveState.BURNING) == "burning"
 
 
 def test_eco_mode_enabled() -> None:

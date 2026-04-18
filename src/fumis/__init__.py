@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .const import StoveModelInfo, StoveStatus
+from .const import StoveModelInfo, StoveState, StoveStatus
 from .exceptions import (
     FumisAuthenticationError,
     FumisConnectionError,
@@ -50,6 +50,7 @@ __all__ = [
     "Power",
     "Statistic",
     "StoveModelInfo",
+    "StoveState",
     "StoveStatus",
     "Temperature",
     "TimerProgram",
