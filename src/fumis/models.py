@@ -100,7 +100,7 @@ class _BaseModel(DataClassORJSONMixin):
 
 
 @dataclass(frozen=True)
-class DiagnosticItem(_BaseModel):
+class FumisDiagnosticItem(_BaseModel):
     """A single diagnostic variable or parameter entry."""
 
     id: int
@@ -108,12 +108,12 @@ class DiagnosticItem(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Diagnostic(_BaseModel):
-    """Diagnostic data from the Fumis controller."""
+class FumisDiagnostic(_BaseModel):
+    """FumisDiagnostic data from the Fumis controller."""
 
-    variables: list[DiagnosticItem] = field(default_factory=list)
-    parameters: list[DiagnosticItem] = field(default_factory=list)
-    timers: list[DiagnosticItem] = field(default_factory=list)
+    variables: list[FumisDiagnosticItem] = field(default_factory=list)
+    parameters: list[FumisDiagnosticItem] = field(default_factory=list)
+    timers: list[FumisDiagnosticItem] = field(default_factory=list)
 
     def variable(self, variable_id: int) -> int | None:
         """Get the value of a diagnostic variable by ID.
@@ -147,7 +147,7 @@ class Diagnostic(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Temperature(_BaseModel):
+class FumisTemperature(_BaseModel):
     """A temperature channel from the Fumis controller."""
 
     id: int
@@ -163,8 +163,8 @@ class Temperature(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Power(_BaseModel):
-    """Power state of the Fumis controller."""
+class FumisPower(_BaseModel):
+    """FumisPower state of the Fumis controller."""
 
     kw: float = field(
         default=0,
@@ -177,7 +177,7 @@ class Power(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Fan(_BaseModel):
+class FumisFan(_BaseModel):
     """A fan entry from the Fumis controller."""
 
     id: int
@@ -187,7 +187,7 @@ class Fan(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Fuel(_BaseModel):
+class FumisFuel(_BaseModel):
     """A fuel entry from the Fumis controller."""
 
     id: int
@@ -220,7 +220,7 @@ class Fuel(_BaseModel):
 
 
 @dataclass(frozen=True)
-class EcoMode(_BaseModel):
+class FumisEcoMode(_BaseModel):
     """Eco mode state of the Fumis controller."""
 
     eco_mode_enable: int | None = field(
@@ -237,8 +237,8 @@ class EcoMode(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Hybrid(_BaseModel):
-    """Hybrid mode state (wood + pellet stoves)."""
+class FumisHybrid(_BaseModel):
+    """FumisHybrid mode state (wood + pellet stoves)."""
 
     actual_type: int = field(default=0, metadata=field_options(alias="actualType"))
     operation: int = 0
@@ -246,15 +246,15 @@ class Hybrid(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Antifreeze(_BaseModel):
-    """Antifreeze protection settings."""
+class FumisAntifreeze(_BaseModel):
+    """FumisAntifreeze protection settings."""
 
     temperature: float | None = None
     enable: bool | None = None
 
 
 @dataclass(frozen=True)
-class Statistic(_BaseModel):
+class FumisStatistic(_BaseModel):
     """Statistics counters from the Fumis controller."""
 
     igniter_starts: int = field(
@@ -288,7 +288,7 @@ class Statistic(_BaseModel):
 
 
 @dataclass(frozen=True)
-class Unit(_BaseModel):
+class FumisUnit(_BaseModel):
     """WiRCU box information."""
 
     id: str = "Unknown"
@@ -319,7 +319,7 @@ _DAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "su
 
 
 @dataclass(frozen=True)
-class TimerProgram:
+class FumisTimerProgram:
     """A single timer program (time slot) from the weekly schedule."""
 
     start_hour: int
@@ -346,10 +346,15 @@ class TimerProgram:
 
 
 @dataclass(frozen=True)
-class WeekSchedule:
+class FumisWeekSchedule:
     """Weekly timer schedule parsed from diagnostic timers."""
 
-    programs: tuple[TimerProgram, TimerProgram, TimerProgram, TimerProgram]
+    programs: tuple[
+        FumisTimerProgram,
+        FumisTimerProgram,
+        FumisTimerProgram,
+        FumisTimerProgram,
+    ]
     """The 4 available timer programs (time slots)."""
 
     days: dict[str, tuple[bool, bool]]
@@ -363,7 +368,7 @@ class WeekSchedule:
 
 @dataclass(frozen=True)
 # pylint: disable-next=too-many-instance-attributes,too-many-public-methods
-class Controller(_BaseModel):
+class FumisController(_BaseModel):
     """Fumis stove controller state."""
 
     type: int = 0
@@ -412,17 +417,17 @@ class Controller(_BaseModel):
         ),
     )
 
-    power: Power = field(default_factory=Power)
-    statistic: Statistic = field(default_factory=Statistic)
-    diagnostic: Diagnostic = field(default_factory=Diagnostic)
-    eco_mode: EcoMode | None = field(
+    power: FumisPower = field(default_factory=FumisPower)
+    statistic: FumisStatistic = field(default_factory=FumisStatistic)
+    diagnostic: FumisDiagnostic = field(default_factory=FumisDiagnostic)
+    eco_mode: FumisEcoMode | None = field(
         default=None, metadata=field_options(alias="ecoMode")
     )
-    hybrid: Hybrid | None = None
-    antifreeze: Antifreeze | None = None
-    fans: list[Fan] = field(default_factory=list)
-    temperatures: list[Temperature] = field(default_factory=list)
-    fuels: list[Fuel] = field(default_factory=list)
+    hybrid: FumisHybrid | None = None
+    antifreeze: FumisAntifreeze | None = None
+    fans: list[FumisFan] = field(default_factory=list)
+    temperatures: list[FumisTemperature] = field(default_factory=list)
+    fuels: list[FumisFuel] = field(default_factory=list)
 
     # -- Status --
 
@@ -457,7 +462,7 @@ class Controller(_BaseModel):
     # -- Temperatures --
 
     @property
-    def main_temperature(self) -> Temperature | None:
+    def main_temperature(self) -> FumisTemperature | None:
         """Find the primary temperature channel.
 
         Prefers the entry marked as on-screen with an actual reading;
@@ -480,7 +485,7 @@ class Controller(_BaseModel):
                 return temp.actual
         return None
 
-    # -- Diagnostic sensors --
+    # -- FumisDiagnostic sensors --
 
     @property
     def exhaust_temperature(self) -> int | None:
@@ -598,37 +603,37 @@ class Controller(_BaseModel):
     # -- Schedule --
 
     @property
-    def schedule(self) -> WeekSchedule:
+    def schedule(self) -> FumisWeekSchedule:
         """Parse the weekly timer schedule from diagnostic timers."""
         t = self.diagnostic.timer
         programs = (
-            TimerProgram(t(0), t(1), t(2), t(3)),
-            TimerProgram(t(4), t(5), t(6), t(7)),
-            TimerProgram(t(8), t(9), t(10), t(11)),
-            TimerProgram(t(12), t(13), t(14), t(15)),
+            FumisTimerProgram(t(0), t(1), t(2), t(3)),
+            FumisTimerProgram(t(4), t(5), t(6), t(7)),
+            FumisTimerProgram(t(8), t(9), t(10), t(11)),
+            FumisTimerProgram(t(12), t(13), t(14), t(15)),
         )
         days = {
             day: (t(16 + i * 2) == 1, t(17 + i * 2) == 1) for i, day in enumerate(_DAYS)
         }
-        return WeekSchedule(programs=programs, days=days)
+        return FumisWeekSchedule(programs=programs, days=days)
 
     # -- Lookups --
 
-    def fan(self, fan_id: int = 1) -> Fan | None:
+    def fan(self, fan_id: int = 1) -> FumisFan | None:
         """Find a fan entry by ID."""
         return next((f for f in self.fans if f.id == fan_id), None)
 
-    def fuel(self, fuel_id: int = 1) -> Fuel | None:
+    def fuel(self, fuel_id: int = 1) -> FumisFuel | None:
         """Find a fuel entry by ID."""
         return next((f for f in self.fuels if f.id == fuel_id), None)
 
-    def temperature_channel(self, channel_id: int) -> Temperature | None:
+    def temperature_channel(self, channel_id: int) -> FumisTemperature | None:
         """Find a temperature channel by ID."""
         return next((t for t in self.temperatures if t.id == channel_id), None)
 
 
 @dataclass(frozen=True)
-class Info(_BaseModel):
+class FumisInfo(_BaseModel):
     """Top-level Fumis WiRCU API response.
 
     This is the complete device status returned by GET /v1/status.
@@ -636,8 +641,8 @@ class Info(_BaseModel):
     `controller` objects.
     """
 
-    unit: Unit = field(default_factory=Unit)
-    controller: Controller = field(default_factory=Controller)
+    unit: FumisUnit = field(default_factory=FumisUnit)
+    controller: FumisController = field(default_factory=FumisController)
     api_version: AwesomeVersion = field(
         default_factory=lambda: AwesomeVersion("0"),
         metadata=field_options(alias="apiVersion"),

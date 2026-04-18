@@ -22,7 +22,7 @@ from fumis.fumis import Fumis
 from .async_typer import AsyncTyper
 
 if TYPE_CHECKING:
-    from fumis.models import Controller, Info
+    from fumis.models import FumisController, FumisInfo
 
 cli = AsyncTyper(
     help="Fumis WiRCU CLI — run without a command to launch the live TUI.",
@@ -147,7 +147,7 @@ def connection_error_handler(_: FumisConnectionError) -> None:
     sys.exit(1)
 
 
-async def _fetch_info(mac: str, password: str) -> Info:
+async def _fetch_info(mac: str, password: str) -> FumisInfo:
     """Fetch device info from the Fumis API."""
     async with Fumis(mac=mac, password=password) as fumis:
         return await fumis.update_info()
@@ -176,7 +176,7 @@ STATUS_ICONS: dict[StoveStatus, str] = {
 }
 
 
-def _status_display(c: Controller) -> str:
+def _status_display(c: FumisController) -> str:
     """Return a formatted status string with icon and state hint."""
     status = c.stove_status
     icon = STATUS_ICONS.get(status, "\u2753")
@@ -185,7 +185,7 @@ def _status_display(c: Controller) -> str:
 
 
 def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches,too-many-statements
-    info: Info,
+    info: FumisInfo,
 ) -> None:
     """Render the full stove info display."""
     c = info.controller

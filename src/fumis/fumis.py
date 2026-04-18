@@ -19,7 +19,7 @@ from .exceptions import (
     FumisResponseError,
     FumisStoveOfflineError,
 )
-from .models import Info
+from .models import FumisInfo
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -36,7 +36,7 @@ class Fumis:
     request_timeout: int = 60
     session: aiohttp.ClientSession | None = None
 
-    info: Info | None = field(default=None, init=False)
+    info: FumisInfo | None = field(default=None, init=False)
     _close_session: bool = field(default=False, init=False)
 
     async def _request(
@@ -119,7 +119,7 @@ class Fumis:
         }
         await self._request("status", method="POST", data=command_data)
 
-    async def update_info(self) -> Info:
+    async def update_info(self) -> FumisInfo:
         """Get all information about the Fumis WiRCU device."""
         try:
             data = await self._request("status")
@@ -127,7 +127,7 @@ class Fumis:
             self.info = None
             raise
 
-        self.info = Info.from_dict(data)
+        self.info = FumisInfo.from_dict(data)
         _LOGGER.debug(
             "Updated info: status=%s, temp=%s",
             self.info.controller.stove_status.name,
