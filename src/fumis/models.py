@@ -11,7 +11,7 @@ from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
 
-from .const import STOVE_MODELS, StoveModelInfo, StoveStatus
+from .const import STOVE_MODELS, StoveModelInfo, StoveState, StoveStatus
 
 
 class _AwesomeVersionStrategy(SerializationStrategy):
@@ -362,7 +362,7 @@ class WeekSchedule:
 
 
 @dataclass(frozen=True)
-# pylint: disable-next=too-many-instance-attributes
+# pylint: disable-next=too-many-instance-attributes,too-many-public-methods
 class Controller(_BaseModel):
     """Fumis stove controller state."""
 
@@ -444,6 +444,15 @@ class Controller(_BaseModel):
             StoveStatus.WOOD_BURNING_OFF,
             StoveStatus.UNKNOWN,
         )
+
+    @property
+    def state(self) -> StoveState:
+        """Return the simplified stove state.
+
+        Maps the 14 raw status codes into consumer-friendly states
+        (off, heating_up, ignition, burning, eco, cooling, unknown).
+        """
+        return StoveState.from_status(self.stove_status)
 
     # -- Temperatures --
 

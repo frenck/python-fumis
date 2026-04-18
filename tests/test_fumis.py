@@ -18,6 +18,7 @@ from fumis import (
     FumisResponseError,
     FumisStoveOfflineError,
     Info,
+    StoveState,
     StoveStatus,
 )
 
@@ -630,6 +631,37 @@ def test_on_based_on_status() -> None:
     # Unknown status = not on
     info = Info.from_dict({"controller": {"status": 999}})
     assert info.controller.on is False
+
+
+@pytest.mark.parametrize(
+    ("status_code", "expected_state"),
+    [
+        (0, StoveState.OFF),  # OFF
+        (1, StoveState.OFF),  # COLD_START_OFF
+        (2, StoveState.OFF),  # WOOD_BURNING_OFF
+        (10, StoveState.HEATING_UP),  # PRE_HEATING
+        (20, StoveState.IGNITION),  # IGNITION
+        (21, StoveState.IGNITION),  # PRE_COMBUSTION
+        (30, StoveState.BURNING),  # COMBUSTION
+        (40, StoveState.ECO),  # ECO
+        (50, StoveState.COOLING),  # COOLING
+        (60, StoveState.HEATING_UP),  # HYBRID_INIT
+        (80, StoveState.IGNITION),  # HYBRID_START
+        (90, StoveState.IGNITION),  # WOOD_START
+        (100, StoveState.HEATING_UP),  # COLD_START
+        (110, StoveState.BURNING),  # WOOD_COMBUSTION
+        (999, StoveState.UNKNOWN),  # unmapped
+    ],
+)
+def test_stove_state(status_code: int, expected_state: StoveState) -> None:
+    """Test simplified state derived from raw status for all mappings."""
+    info = Info.from_dict({"controller": {"status": status_code}})
+    assert info.controller.state == expected_state
+
+
+def test_stove_state_is_str_enum() -> None:
+    """Test StoveState serializes cleanly as a string."""
+    assert str(StoveState.BURNING) == "burning"
 
 
 def test_eco_mode_enabled() -> None:
