@@ -368,7 +368,7 @@ class WeekSchedule:
 
 
 @dataclass(frozen=True)
-# pylint: disable-next=too-many-instance-attributes
+# pylint: disable-next=too-many-instance-attributes,too-many-public-methods
 class Controller(_BaseModel):
     """Fumis stove controller state."""
 
