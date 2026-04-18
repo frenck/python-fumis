@@ -181,13 +181,6 @@ def _status_display(c: Controller) -> str:
     status = c.stove_status
     icon = STATUS_ICONS.get(status, "\u2753")
     label = status.name.replace("_", " ").title()
-
-    # Show a hint when state and status disagree
-    if status == StoveStatus.OFF and c.on:
-        return f"\U0001f9e8 {label} [dim](starting\u2026)[/dim]"
-    if status != StoveStatus.OFF and not c.on:
-        return f"{icon}  {label} [dim](shutting down\u2026)[/dim]"
-
     return f"{icon}  {label}"
 
 
