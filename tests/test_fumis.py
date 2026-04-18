@@ -617,9 +617,18 @@ def test_unknown_status_code() -> None:
     assert info.controller.stove_status == StoveStatus.UNKNOWN
 
 
-def test_unknown_command_code() -> None:
-    """Test unknown command code treats stove as off."""
-    info = Info.from_dict({"controller": {"command": 99}})
+def test_on_based_on_status() -> None:
+    """Test on property is based on status, not command."""
+    # Status OFF = not on, regardless of command
+    info = Info.from_dict({"controller": {"status": 0, "command": 2}})
+    assert info.controller.on is False
+
+    # Status COMBUSTION = on, even with command=1 (normal after ack)
+    info = Info.from_dict({"controller": {"status": 30, "command": 1}})
+    assert info.controller.on is True
+
+    # Unknown status = not on
+    info = Info.from_dict({"controller": {"status": 999}})
     assert info.controller.on is False
 
 

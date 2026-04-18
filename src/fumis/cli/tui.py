@@ -48,10 +48,6 @@ class StatusWidget(Static):
         icon = STATUS_ICONS.get(status, "\u2753")
 
         status_label = status.name.replace("_", " ").title()
-        if status == StoveStatus.OFF and c.on:
-            status_label += " (starting\u2026)"
-        elif status != StoveStatus.OFF and not c.on:
-            status_label += " (shutting down\u2026)"
 
         main_temp = c.main_temperature
         temp_str = ""

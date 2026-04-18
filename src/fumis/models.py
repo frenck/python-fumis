@@ -433,8 +433,17 @@ class Controller(_BaseModel):
 
     @property
     def on(self) -> bool:
-        """Return whether the stove is commanded on."""
-        return self.command == 2
+        """Return whether the stove is operationally active.
+
+        Based on status, not command. The command field is transient
+        and resets after being acknowledged by the controller.
+        """
+        return self.stove_status not in (
+            StoveStatus.OFF,
+            StoveStatus.COLD_START_OFF,
+            StoveStatus.WOOD_BURNING_OFF,
+            StoveStatus.UNKNOWN,
+        )
 
     # -- Temperatures --
 

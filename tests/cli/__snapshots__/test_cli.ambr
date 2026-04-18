@@ -1227,15 +1227,15 @@
     ID: AABBCCDDEEFF • WiRCU 2.5.0 • Controller 2.6.0 • API 1.3
   
   ╭────────────────────── Status ──────────────────────╮
-  │   🏠 Status          ❄  Cooling (shutting down…)   │
-  │   🌡️  Temperature    20.7° → 25.0°                 │
-  │   🔥 Combustion      206.0°                        │
-  │   ⚡ Power           4.6 kW (level 5)              │
-  │   ⛽ Fuel            █████████░ 95%                │
-  │   🚪 Door            Closed                        │
-  │   ⭘  Eco mode        Off                           │
-  │   ❄️  Antifreeze     On (5.0°)                     │
-  │   🪵  Hybrid         Yes                           │
+  │   🏠 Status                ❄  Cooling              │
+  │   🌡️  Temperature          20.7° → 25.0°           │
+  │   🔥 Combustion            206.0°                  │
+  │   ⚡ Power                 4.6 kW (level 5)        │
+  │   ⛽ Fuel                  █████████░ 95%          │
+  │   🚪 Door                  Closed                  │
+  │   ⭘  Eco mode              Off                     │
+  │   ❄️  Antifreeze           On (5.0°)               │
+  │   🪵  Hybrid               Yes                     │
   ╰────────────────────────────────────────────────────╯
    ╭───────── Network ──────────╮  ╭────── Statistics ──────╮ 
    │  📡 IP      192.168.1.2    │  │  🔄 Starts   2         │ 
@@ -1253,12 +1253,12 @@
     ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
   
   ╭────────────────────── Status ──────────────────────╮
-  │   🏠 Status               🧨 Off (starting…)       │
-  │   🌡️  Temperature         19.9° → 21.8°            │
-  │   💨 Exhaust              23°                      │
-  │   ⚡ Power                0.0 kW (level 2)         │
-  │   ⛽ Fuel                 ░░░░░░░░░░ 0%            │
-  │   ⭘  Eco mode             Off                      │
+  │   🏠 Status                ⭘  Off                  │
+  │   🌡️  Temperature          19.9° → 21.8°           │
+  │   💨 Exhaust               23°                     │
+  │   ⚡ Power                 0.0 kW (level 2)        │
+  │   ⛽ Fuel                  ░░░░░░░░░░ 0%           │
+  │   ⭘  Eco mode              Off                     │
   ╰────────────────────────────────────────────────────╯
    ╭───────── Network ─────────╮  ╭───── Statistics ─────╮ 
    │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
