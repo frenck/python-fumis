@@ -633,43 +633,34 @@ def test_on_based_on_status() -> None:
     assert info.controller.on is False
 
 
-def test_stove_state() -> None:
-    """Test simplified state derived from raw status."""
-    # OFF statuses map to OFF state
-    info = Info.from_dict({"controller": {"status": 0}})
-    assert info.controller.state == StoveState.OFF
+@pytest.mark.parametrize(
+    ("status_code", "expected_state"),
+    [
+        (0, StoveState.OFF),  # OFF
+        (1, StoveState.OFF),  # COLD_START_OFF
+        (2, StoveState.OFF),  # WOOD_BURNING_OFF
+        (10, StoveState.HEATING_UP),  # PRE_HEATING
+        (20, StoveState.IGNITION),  # IGNITION
+        (21, StoveState.IGNITION),  # PRE_COMBUSTION
+        (30, StoveState.BURNING),  # COMBUSTION
+        (40, StoveState.ECO),  # ECO
+        (50, StoveState.COOLING),  # COOLING
+        (60, StoveState.HEATING_UP),  # HYBRID_INIT
+        (80, StoveState.IGNITION),  # HYBRID_START
+        (90, StoveState.IGNITION),  # WOOD_START
+        (100, StoveState.HEATING_UP),  # COLD_START
+        (110, StoveState.BURNING),  # WOOD_COMBUSTION
+        (999, StoveState.UNKNOWN),  # unmapped
+    ],
+)
+def test_stove_state(status_code: int, expected_state: StoveState) -> None:
+    """Test simplified state derived from raw status for all mappings."""
+    info = Info.from_dict({"controller": {"status": status_code}})
+    assert info.controller.state == expected_state
 
-    # PRE_HEATING maps to HEATING_UP
-    info = Info.from_dict({"controller": {"status": 10}})
-    assert info.controller.state == StoveState.HEATING_UP
 
-    # IGNITION and PRE_COMBUSTION map to IGNITION
-    info = Info.from_dict({"controller": {"status": 20}})
-    assert info.controller.state == StoveState.IGNITION
-    info = Info.from_dict({"controller": {"status": 21}})
-    assert info.controller.state == StoveState.IGNITION
-
-    # COMBUSTION maps to BURNING
-    info = Info.from_dict({"controller": {"status": 30}})
-    assert info.controller.state == StoveState.BURNING
-
-    # ECO maps to ECO
-    info = Info.from_dict({"controller": {"status": 40}})
-    assert info.controller.state == StoveState.ECO
-
-    # COOLING maps to COOLING
-    info = Info.from_dict({"controller": {"status": 50}})
-    assert info.controller.state == StoveState.COOLING
-
-    # WOOD_COMBUSTION maps to BURNING
-    info = Info.from_dict({"controller": {"status": 110}})
-    assert info.controller.state == StoveState.BURNING
-
-    # Unknown maps to UNKNOWN
-    info = Info.from_dict({"controller": {"status": 999}})
-    assert info.controller.state == StoveState.UNKNOWN
-
-    # StrEnum serializes cleanly
+def test_stove_state_is_str_enum() -> None:
+    """Test StoveState serializes cleanly as a string."""
     assert str(StoveState.BURNING) == "burning"
 
 

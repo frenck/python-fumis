@@ -11,13 +11,7 @@ from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
 
-from .const import (
-    _STATUS_TO_STATE,
-    STOVE_MODELS,
-    StoveModelInfo,
-    StoveState,
-    StoveStatus,
-)
+from .const import STOVE_MODELS, StoveModelInfo, StoveState, StoveStatus
 
 
 class _AwesomeVersionStrategy(SerializationStrategy):
@@ -458,7 +452,7 @@ class Controller(_BaseModel):
         Maps the 14 raw status codes into consumer-friendly states
         (off, heating_up, ignition, burning, eco, cooling, unknown).
         """
-        return _STATUS_TO_STATE.get(self.stove_status, StoveState.UNKNOWN)
+        return StoveState.from_status(self.stove_status)
 
     # -- Temperatures --
 

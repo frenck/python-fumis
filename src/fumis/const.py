@@ -89,8 +89,12 @@ class StoveState(StrEnum):
     UNKNOWN = "unknown"
     """Unknown or unmapped status."""
 
+    @classmethod
+    def from_status(cls, status: StoveStatus) -> StoveState:
+        """Convert a raw StoveStatus to a simplified StoveState."""
+        return _STATUS_TO_STATE.get(status, cls.UNKNOWN)
 
-#: Maps each raw StoveStatus to a simplified StoveState.
+
 _STATUS_TO_STATE: dict[StoveStatus, StoveState] = {
     StoveStatus.OFF: StoveState.OFF,
     StoveStatus.COLD_START_OFF: StoveState.OFF,
