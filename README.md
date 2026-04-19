@@ -340,6 +340,26 @@ The original setup of this repository is by [Franck Nijhof][frenck].
 For a full list of all authors and contributors,
 check [the contributor's page][contributors].
 
+## Disclaimer
+
+This project is an independent, community-driven effort. It is **not
+affiliated with, endorsed by, or supported by** Fumis (ATech elektronika
+d.o.o.) or any stove manufacturer. All product names, trademarks, and
+registered trademarks are property of their respective owners.
+
+This library was developed by observing network traffic from devices we own,
+using publicly available service manuals, and building on existing community
+integrations. No access controls were bypassed and no proprietary code was
+used. This work is done for interoperability purposes, protected under EU
+law including the Software Directive (2009/24/EC), the Data Act (2023/2854),
+and the GDPR. See [RESEARCH.md](RESEARCH.md) for the full legal basis and
+methodology.
+
+Use this software at your own risk. The authors are not responsible for any
+damage to your stove, property, or person resulting from the use of this
+library. Pellet stoves involve fire and heat; always follow your
+manufacturer's safety guidelines.
+
 ## License
 
 MIT License
