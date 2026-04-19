@@ -555,6 +555,15 @@ Pure pellet stoves return `null`.
 
 ## Antifreeze
 
+Antifreeze protection automatically starts the stove when the room
+temperature drops below a configured threshold. This prevents pipes
+and water systems from freezing in hydronic (water-connected) stoves
+or simply keeps the room above a minimum temperature.
+
+When enabled, the stove will ignite on its own if the main temperature
+sensor reads below `antifreeze.temperature`, even if the stove is
+otherwise off. The threshold is configurable via parameter P102.
+
 `controller.antifreeze` object:
 
 ```json
@@ -564,10 +573,14 @@ Pure pellet stoves return `null`.
 }
 ```
 
-| Field         | Type         | Description                              |
-| ------------- | ------------ | ---------------------------------------- |
-| `temperature` | `float\|null` | Antifreeze trigger temperature          |
-| `enable`      | `bool`       | Whether antifreeze protection is active  |
+| Field         | Type          | Description                                        |
+| ------------- | ------------- | -------------------------------------------------- |
+| `temperature` | `float\|null` | Trigger threshold in Celsius (null if unsupported) |
+| `enable`      | `bool\|null`  | Whether antifreeze protection is on (null if unsupported) |
+
+The entire `antifreeze` object is `null` on stoves that do not support
+this feature. When present, `enable: true` means the stove will auto-start
+if the room drops below the configured temperature.
 
 ---
 
