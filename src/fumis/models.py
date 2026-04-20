@@ -38,6 +38,19 @@ class _StringToIntStrategy(SerializationStrategy):
         return int(value)
 
 
+class _OptionalIntStrategy(SerializationStrategy):
+    """Deserialize a string-or-int to int|None, with -1 as None."""
+
+    def serialize(self, value: int | None) -> int:
+        """Serialize None back to -1."""
+        return -1 if value is None else value
+
+    def deserialize(self, value: str | int) -> int | None:
+        """Deserialize from string or int, -1 becomes None."""
+        result = int(value)
+        return None if result == -1 else result
+
+
 class _StringToFloatStrategy(SerializationStrategy):
     """Deserialize a string-encoded float (e.g., heatingSlope "0.0")."""
 
@@ -395,11 +408,11 @@ class FumisController(_BaseModel):
         default=False, metadata=field_options(alias="timerEnable")
     )
     fuel_type: int = field(default=0, metadata=field_options(alias="fuelType"))
-    time_to_service: int = field(
-        default=0,
+    time_to_service: int | None = field(
+        default=None,
         metadata=field_options(
             alias="timeToService",
-            serialization_strategy=_StringToIntStrategy(),
+            serialization_strategy=_OptionalIntStrategy(),
         ),
     )
     delayed_start_at: datetime | None = field(
@@ -590,15 +603,6 @@ class FumisController(_BaseModel):
         """Return the stove model name, if known."""
         info = self.model_info
         return info.model if info else None
-
-    @property
-    def backwater_temperature(self) -> int | None:
-        """Return backwater temperature (for hydronic stoves).
-
-        From VARIABLE_BACKWATER_TEMPERATURE (var[22]).
-        Returns None if not available.
-        """
-        return self.diagnostic.variable(22)
 
     # -- Schedule --
 

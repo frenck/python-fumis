@@ -18,7 +18,6 @@ async def main() -> None:
         print(f"Exhaust temp: {info.controller.exhaust_temperature}")
         print(f"Pressure: {info.controller.pressure}")
         print(f"Door open: {info.controller.door_open}")
-        print(f"Backwater temp: {info.controller.backwater_temperature}")
 
         # Stove model identification
         print(f"Stove model var: {info.controller.stove_model}")

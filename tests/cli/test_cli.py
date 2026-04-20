@@ -140,6 +140,20 @@ def test_info_pellet_stove(
     assert output == snapshot
 
 
+def test_info_pellet_stove_simple(
+    runner: CliRunner,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Info command renders simple pellet stove (no hybrid, no fuel sensor)."""
+    exit_code, output = _invoke(
+        runner,
+        ["info", "--mac", "AABBCCDDEEFF", "--password", "1234"],
+        fixture_name="pellet_stove_simple.json",
+    )
+    assert exit_code == 0
+    assert output == snapshot
+
+
 def test_info_error_state(
     runner: CliRunner,
     snapshot: SnapshotAssertion,

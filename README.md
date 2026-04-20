@@ -192,7 +192,6 @@ c.pressure                # Pressure sensor (var[35])
 c.door_open               # Door sensor (var[33]) - True/False/None
 c.stove_model             # Stove model ID (var[96])
 c.parameter_version       # Parameter version (var[97])
-c.backwater_temperature   # Backwater temp for hydronic stoves (var[22])
 
 # Raw diagnostic access (escape hatch)
 c.diagnostic.variable(42)   # Any variable by ID → int | None
