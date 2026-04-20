@@ -364,10 +364,13 @@ async def test_info_pellet_stove_simple(
     # Verify null/missing fields handled correctly
     assert info.controller.hybrid is None
     assert info.controller.combustion_chamber_temperature is None
-    assert info.controller.fuel().quantity is None
-    assert info.controller.fuel().quantity_percentage is None
+    fuel = info.controller.fuel()
+    assert fuel is not None
+    assert fuel.quantity is None
+    assert fuel.quantity_percentage is None
     assert info.controller.stove_model is None
     assert info.controller.manufacturer is None
+    assert info.controller.eco_mode is not None
     assert info.controller.eco_mode.enabled is True
     assert info.unit.temperature is None
 

@@ -123,7 +123,9 @@ class InfoWidget(Static):
             f"  \U0001f504 Starts   {stats.igniter_starts}",
             f"  \U0001f525 Heating  {int(stats.heating_time.total_seconds()) // 3600}h",
             f"  \u23f1\ufe0f  Uptime  {int(stats.uptime.total_seconds()) // 3600}h",
-            f"  \U0001f527 Service  {'in ' + str(c.time_to_service) + 'h' if c.time_to_service is not None else 'N/A'}",
+            f"  \U0001f527 Service  in {c.time_to_service}h"
+            if c.time_to_service is not None
+            else "  \U0001f527 Service  N/A",
         ]
 
         self.update("\n".join(lines))
