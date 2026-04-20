@@ -788,7 +788,7 @@ with the PelletControl app's service info screen, and community fixtures.
 | 15  | Uptime                               |
 | 17  | Heating time                         |
 | 19  | Service time                         |
-| 22  | Backwater temperature (hydronic)     |
+| 22  | Backwater temperature (hydronic) *   |
 | 23  | Controller clock: seconds            |
 | 24  | Controller clock: minutes            |
 | 25  | Controller clock: hours              |
@@ -806,6 +806,16 @@ with the PelletControl app's service info screen, and community fixtures.
 | 97  | Parameter version                    |
 | 98  | External thermostat enabled          |
 | 99  | External thermostat contact state    |
+
+\* **var[22] note:** This variable is documented as the backwater (return water)
+temperature for hydronic stoves. However, on non-hydronic stoves
+(Austroflamm Clou Duo, simple pellet stoves), this variable holds values
+around 200-212 that do not correlate with any observable temperature and
+change slowly over time, suggesting it may serve as an accumulated counter
+on stoves without a water circuit. The value is only meaningful as a
+temperature on hydronic stoves with an actual backwater sensor. Consumers
+should use `diagnostic.variable(22)` directly if they know their stove
+is hydronic.
 
 ### Error Log Structure
 

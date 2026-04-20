@@ -83,7 +83,6 @@
   │ │ Fan 2 speed                                                       │ 0                        │ │
   │ │ Exhaust gas temp                                                  │ 0°                       │ │
   │ │ Combustion chamber                                                │ 104.0°                   │ │
-  │ │ Backwater temp                                                    │ 232°                     │ │
   │ │ F02                                                               │ 875                      │ │
   │ │ Pressure                                                          │ 941                      │ │
   │ │ Power (kW)                                                        │ 7.0                      │ │
@@ -124,7 +123,6 @@
   │ │ Fan 2 speed                                                       │ 0                        │ │
   │ │ Exhaust gas temp                                                  │ 0°                       │ │
   │ │ Combustion chamber                                                │ 256.0°                   │ │
-  │ │ Backwater temp                                                    │ 189°                     │ │
   │ │ F02                                                               │ 1347                     │ │
   │ │ Pressure                                                          │ 608                      │ │
   │ │ Power (kW)                                                        │ 3.6                      │ │
@@ -222,7 +220,6 @@
    │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
    │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
    ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
-                                  │  🔧 Service  in -1h  │ 
                                   ╰──────────────────────╯ 
   
   '''
@@ -297,7 +294,6 @@
    │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
    │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
    ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
-                                  │  🔧 Service  in -1h  │ 
                                   ╰──────────────────────╯ 
   
   '''
@@ -323,7 +319,6 @@
       "current_time": 1574360658,
       "timer_enable": false,
       "fuel_type": 1,
-      "time_to_service": "-1",
       "power": {
         "kw": 0.0,
         "actual_power": 0,
@@ -1188,7 +1183,6 @@
    │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
    │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
    ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
-                                  │  🔧 Service  in -1h  │ 
                                   ╰──────────────────────╯ 
   
   '''
@@ -1217,6 +1211,29 @@
    │  📋 Params  v10             │  │  🔧 Service    in 404h  │ 
    ╰─────────────────────────────╯  │  ⚠️  Misfires  1        │ 
                                     ╰─────────────────────────╯ 
+  
+  '''
+# ---
+# name: test_info_pellet_stove_simple
+  '''
+  
+    🏭 Fumis WiRCU
+    ID: AABBCCDDEEFF • WiRCU 2.0.0 • Controller 1.7.0 • API 1.0
+  
+  ╭────────────────────── Status ──────────────────────╮
+  │   🏠 Status                ⭘  Off                  │
+  │   🌡️  Temperature          21.2° → 21.2°           │
+  │   💨 Exhaust               23°                     │
+  │   ⚡ Power                 0.0 kW (level 1)        │
+  │   🌱  Eco mode             On                      │
+  │   ⭘  Antifreeze            Off                     │
+  ╰────────────────────────────────────────────────────╯
+   ╭───────── Network ─────────╮  ╭───── Statistics ──────╮ 
+   │  📡 IP    192.168.1.3     │  │  🔄 Starts     3669   │ 
+   │  📶 WiFi  -41 dBm (100%)  │  │  🔥 Heating    2442h  │ 
+   ╰───────────────────────────╯  │  ⏱️  Uptime    6031h  │ 
+                                  │  ⚠️  Misfires  3      │ 
+                                  ╰───────────────────────╯ 
   
   '''
 # ---
@@ -1264,7 +1281,6 @@
    │  📡 IP    192.168.1.2     │  │  🔄 Starts   392     │ 
    │  📶 WiFi  -48 dBm (100%)  │  │  🔥 Heating  506h    │ 
    ╰───────────────────────────╯  │  ⏱️  Uptime  16162h  │ 
-                                  │  🔧 Service  in -1h  │ 
                                   ╰──────────────────────╯ 
   
   '''

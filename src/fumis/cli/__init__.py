@@ -306,7 +306,8 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
         "\u23f1\ufe0f  Uptime",
         f"{int(stats.uptime.total_seconds()) // 3600}h",
     )
-    stats_table.add_row("\U0001f527 Service", f"in {c.time_to_service}h")
+    if c.time_to_service is not None:
+        stats_table.add_row("\U0001f527 Service", f"in {c.time_to_service}h")
     if stats.misfires:
         stats_table.add_row(
             "\u26a0\ufe0f  Misfires",
@@ -638,8 +639,6 @@ async def diagnostics_command(
         sensors.add_row("Exhaust gas temp", f"{c.exhaust_temperature}°")
     if c.combustion_chamber_temperature is not None:
         sensors.add_row("Combustion chamber", f"{c.combustion_chamber_temperature}°")
-    if c.backwater_temperature is not None:
-        sensors.add_row("Backwater temp", f"{c.backwater_temperature}°")
     if c.f02 is not None:
         sensors.add_row("F02", str(c.f02))
     if c.pressure is not None:

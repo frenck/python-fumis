@@ -346,6 +346,35 @@ async def test_info_pellet_stove_unknown(
     assert info == snapshot
 
 
+async def test_info_pellet_stove_simple(
+    responses: aioresponses,
+    fumis: Fumis,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test deserialization of a simple pellet stove (no hybrid, no fuel sensor)."""
+    responses.get(
+        f"{API_BASE}status",
+        status=200,
+        body=load_fixture("pellet_stove_simple.json"),
+        content_type="application/json",
+    )
+    info = await fumis.update_info()
+    assert info == snapshot
+
+    # Verify null/missing fields handled correctly
+    assert info.controller.hybrid is None
+    assert info.controller.combustion_chamber_temperature is None
+    fuel = info.controller.fuel()
+    assert fuel is not None
+    assert fuel.quantity is None
+    assert fuel.quantity_percentage is None
+    assert info.controller.stove_model is None
+    assert info.controller.manufacturer is None
+    assert info.controller.eco_mode is not None
+    assert info.controller.eco_mode.enabled is True
+    assert info.unit.temperature is None
+
+
 # --- Fixture-specific assertions ---
 
 
@@ -553,7 +582,6 @@ def test_convenience_properties_none_when_empty() -> None:
     assert info.controller.pressure is None
     assert info.controller.stove_model is None
     assert info.controller.parameter_version is None
-    assert info.controller.backwater_temperature is None
     assert info.controller.combustion_chamber_temperature is None
     assert info.controller.model_info is None
     assert info.controller.manufacturer is None
