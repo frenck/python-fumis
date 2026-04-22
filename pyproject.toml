@@ -71,7 +71,7 @@ pytest-cov = "7.1.0"
 ruff = "0.15.11"
 safety = "3.7.0"
 syrupy = "5.1.0"
-typer = "0.24.1"
+typer = "0.24.2"
 yamllint = "1.38.0"
 zizmor = "1.24.1"
 
