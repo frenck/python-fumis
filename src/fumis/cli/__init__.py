@@ -216,7 +216,7 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
     status_table.add_row("\U0001f3e0 Status", _status_display(c))
 
     if error := c.stove_error:
-        error_label = f"E{c.error}" if error == StoveError.UNKNOWN else str(error)
+        error_label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
         status_table.add_row(
             "\u274c Error",
             f"[red bold]{error_label}[/red bold] [dim]{error.description}[/dim]",
@@ -533,7 +533,7 @@ async def errors_command(
 
     # Current error
     if error := c.stove_error:
-        label = f"E{c.error}" if error == StoveError.UNKNOWN else str(error)
+        label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
         console.print(f"\u274c [red bold]Error {label}:[/red bold] {error.description}")
     else:
         console.print("\u2705 [green bold]No active error[/green bold]")
@@ -574,7 +574,7 @@ async def errors_command(
     for i, (code, date_val, time_val) in enumerate(history, 1):
         err = StoveError.from_code(code)
         if err is None or err == StoveError.UNKNOWN:
-            label = f"E{code}"
+            label = f"E{code:03d}"
             desc = f"Unknown ({code})"
         else:
             label = str(err)

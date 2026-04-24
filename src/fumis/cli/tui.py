@@ -74,7 +74,7 @@ class StatusWidget(Static):
 
         error_str = ""
         if error := c.stove_error:
-            label = f"E{c.error}" if error == StoveError.UNKNOWN else str(error)
+            label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
             error_str = f"\u274c {label}: {error.description}"
         if alert := c.stove_alert:
             label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
