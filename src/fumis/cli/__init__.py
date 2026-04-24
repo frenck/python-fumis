@@ -569,7 +569,7 @@ async def errors_command(
     table.add_column("Date")
     for i, (code, date_val, time_val) in enumerate(history, 1):
         err = StoveError.from_code(code)
-        if err == StoveError.UNKNOWN:
+        if err is None or err == StoveError.UNKNOWN:
             label = f"E{code}"
             desc = f"Unknown ({code})"
         else:

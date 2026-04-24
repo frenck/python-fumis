@@ -268,7 +268,9 @@ class StoveAlert(StrEnum):
 
 
 _ERROR_DESCRIPTIONS: dict[StoveError, str] = {
-    StoveError.IGNITION_FAILED: "Ignition failed / water overtemperature / backfire protection",
+    StoveError.IGNITION_FAILED: (
+        "Ignition failed / water overtemperature / backfire protection"
+    ),
     StoveError.CHIMNEY_DIRTY: "Chimney/burning pot dirty or manually stopped",
     StoveError.SENSOR_T02: "Sensor T02 malfunction",
     StoveError.SENSOR_T03_T05: "Sensor T03/T05 malfunction",
