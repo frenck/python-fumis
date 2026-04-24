@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from fumis.const import StoveStatus
+from fumis.const import StoveError, StoveStatus
 from fumis.exceptions import (
     FumisAuthenticationError,
     FumisConnectionError,
@@ -215,17 +215,15 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
 
     status_table.add_row("\U0001f3e0 Status", _status_display(c))
 
-    if c.error:
-        error_desc = ERROR_DESCRIPTIONS.get(c.error, "Unknown")
+    if error := c.stove_error:
         status_table.add_row(
             "\u274c Error",
-            f"[red bold]E{c.error}[/red bold] [dim]{error_desc}[/dim]",
+            f"[red bold]{error}[/red bold] [dim]{error.description}[/dim]",
         )
-    if c.alert:
-        alert_desc = ALERT_DESCRIPTIONS.get(c.alert, "Unknown")
+    if alert := c.stove_alert:
         status_table.add_row(
             "\u26a0\ufe0f  Alert",
-            f"[yellow bold]A{c.alert:03d}[/yellow bold] [dim]{alert_desc}[/dim]",
+            f"[yellow bold]{alert}[/yellow bold] [dim]{alert.description}[/dim]",
         )
 
     main_temp = c.main_temperature
@@ -511,46 +509,6 @@ async def sync_clock_command(
     console.print("\U0001f552 [green bold]Clock synced.[/green bold]")
 
 
-ERROR_DESCRIPTIONS: dict[int, str] = {
-    0: "No error",
-    101: "Ignition failed / water overtemperature / backfire protection",
-    102: "Chimney/burning pot dirty or manually stopped",
-    105: "Sensor T02 malfunction",
-    106: "Sensor T03/T05 malfunction",
-    107: "Sensor T04 malfunction",
-    108: "Security switch I01 tripped (STB)",
-    109: "Pressure sensor switched OFF",
-    110: "Sensor T01/T02 malfunction",
-    111: "Sensor T01/T03 malfunction",
-    113: "Flue gas overtemperature",
-    114: "Fuel ignition timeout / tank empty",
-    115: "General error",
-    239: "MFDoor Alarm",
-    240: "Fire Error",
-    241: "Chimney Alarm",
-    243: "Grate Error",
-    244: "NTC2 Alarm",
-    245: "NTC3 Alarm",
-    247: "Door Alarm",
-    248: "Pressure Alarm",
-    249: "NTC1 Alarm",
-    250: "TC1 Alarm",
-    252: "Gas Alarm",
-    253: "No Pellet Alarm",
-}
-
-ALERT_DESCRIPTIONS: dict[int, str] = {
-    0: "No alert",
-    1: "Low fuel level",
-    2: "Service due",
-    3: "Flue gas temperature warning",
-    4: "Low battery",
-    5: "Speed sensor failure",
-    6: "Door open",
-    7: "Airflow sensor malfunction (limited mode)",
-}
-
-
 def _format_error_date(date_val: int, time_val: int) -> str:
     """Format an error history date/time entry."""
     parts: list[str] = []
@@ -572,21 +530,19 @@ async def errors_command(
     c = info.controller
 
     # Current error
-    error_desc = ERROR_DESCRIPTIONS.get(c.error, "Unknown")
-    if c.error == 0:
-        console.print("\u2705 [green bold]No active error[/green bold]")
+    if error := c.stove_error:
+        console.print(f"\u274c [red bold]Error {error}:[/red bold] {error.description}")
     else:
-        console.print(f"\u274c [red bold]Error E{c.error}:[/red bold] {error_desc}")
+        console.print("\u2705 [green bold]No active error[/green bold]")
 
     # Current alert
-    alert_desc = ALERT_DESCRIPTIONS.get(c.alert, "Unknown")
-    if c.alert == 0:
-        console.print("\u2705 [green bold]No active alert[/green bold]")
-    else:
+    if alert := c.stove_alert:
         console.print(
-            f"\u26a0\ufe0f  [yellow bold]Alert A{c.alert:03d}:[/yellow bold]"
-            f" {alert_desc}"
+            f"\u26a0\ufe0f  [yellow bold]Alert {alert}:[/yellow bold]"
+            f" {alert.description}"
         )
+    else:
+        console.print("\u2705 [green bold]No active alert[/green bold]")
 
     # Error history from diagnostic variables
     # var[36..95] in groups of 4: [sequence, error_code, date(YYYYMMDD), time]
@@ -612,8 +568,14 @@ async def errors_command(
     table.add_column("Description")
     table.add_column("Date")
     for i, (code, date_val, time_val) in enumerate(history, 1):
-        desc = ERROR_DESCRIPTIONS.get(code, f"Unknown ({code})")
-        table.add_row(str(i), f"E{code}", desc, _format_error_date(date_val, time_val))
+        err = StoveError.from_code(code)
+        if err == StoveError.UNKNOWN:
+            label = f"E{code}"
+            desc = f"Unknown ({code})"
+        else:
+            label = str(err)
+            desc = err.description
+        table.add_row(str(i), label, desc, _format_error_date(date_val, time_val))
     console.print(table)
 
 

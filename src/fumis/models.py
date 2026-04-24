@@ -11,7 +11,14 @@ from mashumaro.config import BaseConfig
 from mashumaro.mixins.orjson import DataClassORJSONMixin
 from mashumaro.types import SerializationStrategy
 
-from .const import STOVE_MODELS, StoveModelInfo, StoveState, StoveStatus
+from .const import (
+    STOVE_MODELS,
+    StoveAlert,
+    StoveError,
+    StoveModelInfo,
+    StoveState,
+    StoveStatus,
+)
 
 
 class _AwesomeVersionStrategy(SerializationStrategy):
@@ -448,6 +455,24 @@ class FumisController(_BaseModel):
     def stove_status(self) -> StoveStatus:
         """Return the stove operational status as an enum."""
         return StoveStatus(self.status)
+
+    @property
+    def stove_error(self) -> StoveError | None:
+        """Return the stove error as an enum, or None if no error.
+
+        Converts the raw integer error code to a StoveError enum
+        whose value matches the device display (e.g., E102).
+        """
+        return StoveError.from_code(self.error)
+
+    @property
+    def stove_alert(self) -> StoveAlert | None:
+        """Return the stove alert as an enum, or None if no alert.
+
+        Converts the raw integer alert code to a StoveAlert enum
+        whose value matches the device display (e.g., A004).
+        """
+        return StoveAlert.from_code(self.alert)
 
     @property
     def on(self) -> bool:

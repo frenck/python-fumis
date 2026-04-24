@@ -15,7 +15,6 @@ from textual.screen import ModalScreen
 from textual.widgets import Footer, Header, Label, Static
 from textual_plotext import PlotextPlot
 
-from fumis.cli import ALERT_DESCRIPTIONS, ERROR_DESCRIPTIONS
 from fumis.const import StoveStatus
 from fumis.fumis import Fumis
 
@@ -74,12 +73,10 @@ class StatusWidget(Static):
             eco_str = "\U0001f331 On" if eco.enabled else "Off"
 
         error_str = ""
-        if c.error:
-            desc = ERROR_DESCRIPTIONS.get(c.error, "Unknown")
-            error_str = f"\u274c E{c.error}: {desc}"
-        if c.alert:
-            desc = ALERT_DESCRIPTIONS.get(c.alert, "Unknown")
-            error_str += f"  \u26a0\ufe0f  A{c.alert:03d}: {desc}"
+        if error := c.stove_error:
+            error_str = f"\u274c {error}: {error.description}"
+        if alert := c.stove_alert:
+            error_str += f"  \u26a0\ufe0f  {alert}: {alert.description}"
 
         lines = [
             f"  {icon}  [bold]{status_label}[/bold]",
