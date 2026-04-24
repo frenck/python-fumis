@@ -213,6 +213,8 @@ class StoveError(StrEnum):
     @property
     def description(self) -> str:
         """Return a human-readable description of this error."""
+        if self is StoveError.UNKNOWN:
+            return "Unknown error code"
         return _ERROR_DESCRIPTIONS.get(self, self.value)
 
 
@@ -264,6 +266,8 @@ class StoveAlert(StrEnum):
     @property
     def description(self) -> str:
         """Return a human-readable description of this alert."""
+        if self is StoveAlert.UNKNOWN:
+            return "Unknown alert code"
         return _ALERT_DESCRIPTIONS.get(self, self.value)
 
 

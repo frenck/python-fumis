@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from fumis.const import StoveError, StoveStatus
+from fumis.const import StoveAlert, StoveError, StoveStatus
 from fumis.exceptions import (
     FumisAuthenticationError,
     FumisConnectionError,
@@ -216,14 +216,16 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
     status_table.add_row("\U0001f3e0 Status", _status_display(c))
 
     if error := c.stove_error:
+        error_label = f"E{c.error}" if error == StoveError.UNKNOWN else str(error)
         status_table.add_row(
             "\u274c Error",
-            f"[red bold]{error}[/red bold] [dim]{error.description}[/dim]",
+            f"[red bold]{error_label}[/red bold] [dim]{error.description}[/dim]",
         )
     if alert := c.stove_alert:
+        alert_label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
         status_table.add_row(
             "\u26a0\ufe0f  Alert",
-            f"[yellow bold]{alert}[/yellow bold] [dim]{alert.description}[/dim]",
+            f"[yellow bold]{alert_label}[/yellow bold] [dim]{alert.description}[/dim]",
         )
 
     main_temp = c.main_temperature
@@ -531,14 +533,16 @@ async def errors_command(
 
     # Current error
     if error := c.stove_error:
-        console.print(f"\u274c [red bold]Error {error}:[/red bold] {error.description}")
+        label = f"E{c.error}" if error == StoveError.UNKNOWN else str(error)
+        console.print(f"\u274c [red bold]Error {label}:[/red bold] {error.description}")
     else:
         console.print("\u2705 [green bold]No active error[/green bold]")
 
     # Current alert
     if alert := c.stove_alert:
+        label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
         console.print(
-            f"\u26a0\ufe0f  [yellow bold]Alert {alert}:[/yellow bold]"
+            f"\u26a0\ufe0f  [yellow bold]Alert {label}:[/yellow bold]"
             f" {alert.description}"
         )
     else:
