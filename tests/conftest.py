@@ -45,6 +45,7 @@ def setup_aioresponses_aiohttp_compat() -> Generator[None, None, None]:
     yield
     monkeypatch.undo()
 
+
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 
