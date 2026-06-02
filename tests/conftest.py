@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING
-from unittest.mock import Mock
 
 import aiohttp
 import pytest
@@ -16,16 +15,41 @@ from fumis import Fumis
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
 
-if "stream_writer" in aiohttp.ClientResponse.__init__.__code__.co_varnames:
-    class AioResponsesClientResponse(aioresponses_core.ClientResponse):
-        """Backwards-compatible ClientResponse for aioresponses."""
+AIOHTTP_REQUIRES_STREAM_WRITER = (
+    "stream_writer" in aiohttp.ClientResponse.__init__.__code__.co_varnames
+)
 
-        def __init__(self, *args, **kwargs):
-            """Initialize and provide a stream_writer for aiohttp 3.14+."""
-            kwargs.setdefault("stream_writer", Mock(output_size=0))
-            super().__init__(*args, **kwargs)
 
-    aioresponses_core.ClientResponse = AioResponsesClientResponse
+class AIOHTTPStreamWriter:
+    """Minimal aiohttp stream writer for tests.
+
+    aiohttp 3.14 reads only ``output_size`` during ClientResponse initialization
+    for this mocked response path.
+    """
+
+    output_size = 0
+
+
+class AioresponsesClientResponse(aioresponses_core.ClientResponse):
+    """Backwards-compatible ClientResponse for aioresponses."""
+
+    def __init__(self, *args, **kwargs):
+        """Initialize and provide a stream_writer for aiohttp 3.14+."""
+        kwargs.setdefault("stream_writer", AIOHTTPStreamWriter())
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_aioresponses_aiohttp_compat() -> Generator[None, None, None]:
+    """Patch aioresponses ClientResponse for aiohttp compatibility in tests."""
+    if not AIOHTTP_REQUIRES_STREAM_WRITER:
+        yield
+        return
+
+    original_client_response = aioresponses_core.ClientResponse
+    aioresponses_core.ClientResponse = AioresponsesClientResponse
+    yield
+    aioresponses_core.ClientResponse = original_client_response
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
