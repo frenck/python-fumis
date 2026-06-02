@@ -4,15 +4,28 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import Mock
 
 import aiohttp
 import pytest
 from aioresponses import aioresponses
+from aioresponses import core as aioresponses_core
 
 from fumis import Fumis
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
+
+if "stream_writer" in aiohttp.ClientResponse.__init__.__code__.co_varnames:
+    class AioResponsesClientResponse(aioresponses_core.ClientResponse):
+        """Backwards-compatible ClientResponse for aioresponses."""
+
+        def __init__(self, *args, **kwargs):
+            """Initialize and provide a stream_writer for aiohttp 3.14+."""
+            kwargs.setdefault("stream_writer", Mock(output_size=0))
+            super().__init__(*args, **kwargs)
+
+    aioresponses_core.ClientResponse = AioResponsesClientResponse
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
