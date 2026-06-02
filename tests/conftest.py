@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from types import SimpleNamespace
+from typing import TYPE_CHECKING, Any
 
 import aiohttp
 import pytest
@@ -20,22 +21,15 @@ AIOHTTP_REQUIRES_STREAM_WRITER = (
 )
 
 
-class AIOHTTPStreamWriter:
-    """Minimal aiohttp stream writer for tests.
-
-    aiohttp 3.14 reads only ``output_size`` during ClientResponse initialization
-    for this mocked response path.
-    """
-
-    output_size = 0
+AIOHTTP_STREAM_WRITER = SimpleNamespace(output_size=0)
 
 
 class AioresponsesClientResponse(aioresponses_core.ClientResponse):
     """Backwards-compatible ClientResponse for aioresponses."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize and provide a stream_writer for aiohttp 3.14+."""
-        kwargs.setdefault("stream_writer", AIOHTTPStreamWriter())
+        kwargs.setdefault("stream_writer", AIOHTTP_STREAM_WRITER)
         super().__init__(*args, **kwargs)
 
 
@@ -46,10 +40,10 @@ def setup_aioresponses_aiohttp_compat() -> Generator[None, None, None]:
         yield
         return
 
-    original_client_response = aioresponses_core.ClientResponse
-    aioresponses_core.ClientResponse = AioresponsesClientResponse
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(aioresponses_core, "ClientResponse", AioresponsesClientResponse)
     yield
-    aioresponses_core.ClientResponse = original_client_response
+    monkeypatch.undo()
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
