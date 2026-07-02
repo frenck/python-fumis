@@ -2320,14 +2320,14 @@ markers = {main = "extra == \"cli\""}
 
 [[package]]
 name = "syrupy"
-version = "5.3.4"
+version = "5.4.0"
 description = "Pytest Snapshot Test Utility"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "syrupy-5.3.4-py3-none-any.whl", hash = "sha256:409348aa20afc4b7dab7c965331de0cd79ab46977877fb189014ce9294e947e5"},
-    {file = "syrupy-5.3.4.tar.gz", hash = "sha256:10f192655a2d42473ad5772653e64b281f6823fe5e30458d92f8ca8e882884c1"},
+    {file = "syrupy-5.4.0-py3-none-any.whl", hash = "sha256:3079017f0c6d3c1b293b57ad2af15cc7851d8eceba922896bdb3bc4834df4ce8"},
+    {file = "syrupy-5.4.0.tar.gz", hash = "sha256:cc166e6331c735b7acc93074f9b171dd1b130444e944b185aa5123767b49b76f"},
 ]
 
 [package.dependencies]
@@ -2690,4 +2690,4 @@ cli = ["rich", "textual", "textual-plotext", "typer"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "2ee94f363ee91ffa1b8ca0d7398146ab2de1ff545aac398e9d2161d6a7424512"
+content-hash = "6e9af63740a79c45398947a8e4b8cf481b0f4ca6e07c056dde34a50a42c471b9"
