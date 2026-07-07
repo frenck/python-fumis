@@ -696,7 +696,7 @@ def test_stove_state_is_str_enum() -> None:
 
 def test_stove_error_from_code() -> None:
     """Test StoveError.from_code conversion."""
-    assert StoveError.from_code(0) is None
+    assert StoveError.from_code(0) == StoveError.NO_ERROR
     assert StoveError.from_code(102) == StoveError.CHIMNEY_DIRTY
     assert StoveError.from_code(241) == StoveError.CHIMNEY_ALARM
     assert StoveError.from_code(999) == StoveError.UNKNOWN
@@ -719,7 +719,7 @@ def test_stove_error_description() -> None:
 
 def test_stove_alert_from_code() -> None:
     """Test StoveAlert.from_code conversion."""
-    assert StoveAlert.from_code(0) is None
+    assert StoveAlert.from_code(0) == StoveAlert.NO_ALERT
     assert StoveAlert.from_code(4) == StoveAlert.LOW_BATTERY
     assert StoveAlert.from_code(1) == StoveAlert.LOW_FUEL
     assert StoveAlert.from_code(99) == StoveAlert.UNKNOWN
@@ -744,7 +744,7 @@ def test_controller_stove_error_property() -> None:
     assert info.controller.stove_error == StoveError.CHIMNEY_DIRTY
 
     info_none = FumisInfo.from_dict({"controller": {"error": 0}})
-    assert info_none.controller.stove_error is None
+    assert info_none.controller.stove_error == StoveError.NO_ERROR
 
 
 def test_controller_stove_alert_property() -> None:
@@ -753,7 +753,7 @@ def test_controller_stove_alert_property() -> None:
     assert info.controller.stove_alert == StoveAlert.LOW_BATTERY
 
     info_none = FumisInfo.from_dict({"controller": {"alert": 0}})
-    assert info_none.controller.stove_alert is None
+    assert info_none.controller.stove_alert == StoveAlert.NO_ALERT
 
 
 def test_eco_mode_enabled() -> None:

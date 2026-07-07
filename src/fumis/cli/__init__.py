@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import json
 import sys
+from dataclasses import replace
 from typing import TYPE_CHECKING, Annotated
 
+import orjson
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -153,11 +155,6 @@ async def _fetch_info(mac: str, password: str) -> FumisInfo:
         return await fumis.update_info()
 
 
-def _emit_json(payload: object) -> None:
-    """Emit a payload as indented JSON on stdout."""
-    typer.echo(json.dumps(payload, indent=2, default=str))
-
-
 STATUS_ICONS: dict[StoveStatus, str] = {
     StoveStatus.OFF: "[dim]\u2b58[/dim]",
     StoveStatus.PRE_HEATING: "[yellow]\u25b2[/yellow]",
@@ -215,13 +212,13 @@ def _render_info(  # noqa: PLR0912, PLR0915  # pylint: disable=too-many-branches
 
     status_table.add_row("\U0001f3e0 Status", _status_display(c))
 
-    if error := c.stove_error:
+    if (error := c.stove_error) != StoveError.NO_ERROR:
         error_label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
         status_table.add_row(
             "\u274c Error",
             f"[red bold]{error_label}[/red bold] [dim]{error.description}[/dim]",
         )
-    if alert := c.stove_alert:
+    if (alert := c.stove_alert) != StoveAlert.NO_ALERT:
         alert_label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
         status_table.add_row(
             "\u26a0\ufe0f  Alert",
@@ -349,9 +346,10 @@ async def info_command(
     info = await _fetch_info(mac, password)
 
     if output_json:
-        data = info.to_dict()
-        data["unit"]["id"] = "**REDACTED**"
-        _emit_json(data)
+        redacted = replace(info, unit=replace(info.unit, id="**REDACTED**"))
+        # pylint: disable-next=no-member
+        payload = orjson.dumps(redacted, default=str, option=orjson.OPT_INDENT_2)
+        typer.echo(payload.decode())
         return
 
     _render_info(info)
@@ -532,21 +530,23 @@ async def errors_command(
     c = info.controller
 
     # Current error
-    if error := c.stove_error:
+    error = c.stove_error
+    if error == StoveError.NO_ERROR:
+        console.print("\u2705 [green bold]No active error[/green bold]")
+    else:
         label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
         console.print(f"\u274c [red bold]Error {label}:[/red bold] {error.description}")
-    else:
-        console.print("\u2705 [green bold]No active error[/green bold]")
 
     # Current alert
-    if alert := c.stove_alert:
+    alert = c.stove_alert
+    if alert == StoveAlert.NO_ALERT:
+        console.print("\u2705 [green bold]No active alert[/green bold]")
+    else:
         label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
         console.print(
             f"\u26a0\ufe0f  [yellow bold]Alert {label}:[/yellow bold]"
             f" {alert.description}"
         )
-    else:
-        console.print("\u2705 [green bold]No active alert[/green bold]")
 
     # Error history from diagnostic variables
     # var[36..95] in groups of 4: [sequence, error_code, date(YYYYMMDD), time]
@@ -573,7 +573,7 @@ async def errors_command(
     table.add_column("Date")
     for i, (code, date_val, time_val) in enumerate(history, 1):
         err = StoveError.from_code(code)
-        if err is None or err == StoveError.UNKNOWN:
+        if err == StoveError.UNKNOWN:
             label = f"E{code:03d}"
             desc = f"Unknown ({code})"
         else:

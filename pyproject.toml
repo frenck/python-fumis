@@ -5,7 +5,7 @@ description = "Asynchronous Python client for the Fumis WiRCU API."
 authors = [{ name = "Franck Nijhof", email = "opensource@frenck.dev" }]
 maintainers = [{ name = "Franck Nijhof", email = "opensource@frenck.dev" }]
 license = "MIT"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 readme = "README.md"
 keywords = [
   "api",
@@ -29,7 +29,6 @@ classifiers = [
   "Framework :: AsyncIO",
   "Intended Audience :: Developers",
   "Natural Language :: English",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
@@ -38,7 +37,7 @@ classifiers = [
 ]
 dynamic = ["dependencies"]
 packages = [{ include = "fumis", from = "src" }]
-dependencies = ['aiohttp (>=3.0.0)', 'awesomeversion (>=22.0.0)', 'mashumaro (>=3.13,<4.0.0)', 'orjson (>=3.9.8)', 'yarl (>=1.6.0)']
+dependencies = ['aiohttp (>=3.0.0)', 'awesomeversion (>=22.0.0)', 'orjson (>=3.9.8)', 'probatio (>=0.9.0)', 'yarl (>=1.6.0)']
 
 [project.optional-dependencies]
 cli = ["rich>=14.0.0", "textual>=8.0.0,<9.0.0; python_version<'4.0'", "textual-plotext>=1.0.0,<2.0.0; python_version<'4.0'", "typer>=0.15.1"]
@@ -89,7 +88,7 @@ omit = [
 ]
 
 [tool.ty.environment]
-python-version = "3.11"
+python-version = "3.12"
 
 [tool.pylint.MASTER]
 ignore = ["tests"]
