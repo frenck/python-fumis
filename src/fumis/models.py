@@ -4,12 +4,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
 from awesomeversion import AwesomeVersion
-from mashumaro import field_options
-from mashumaro.config import BaseConfig
-from mashumaro.mixins.orjson import DataClassORJSONMixin
-from mashumaro.types import SerializationStrategy
+from probatio import (
+    REMOVE_EXTRA,
+    AsTimedelta,
+    Coerce,
+    FromEpoch,
+    Key,
+    Maybe,
+    SchemaMixin,
+)
 
 from .const import (
     STOVE_MODELS,
@@ -21,106 +27,20 @@ from .const import (
 )
 
 
-class _AwesomeVersionStrategy(SerializationStrategy):
-    """Serialize AwesomeVersion to/from string for mashumaro."""
-
-    def serialize(self, value: AwesomeVersion) -> str:
-        """Serialize to string."""
-        return str(value)
-
-    def deserialize(self, value: str) -> AwesomeVersion:
-        """Deserialize from string."""
-        return AwesomeVersion(value)
+def _sentinel_int(value: str | int) -> int | None:
+    """Map the -1 sentinel to None, otherwise coerce to int."""
+    result = int(value)
+    return None if result == -1 else result
 
 
-class _StringToIntStrategy(SerializationStrategy):
-    """Deserialize a string-encoded integer (e.g., RSSI "-48")."""
-
-    def serialize(self, value: int) -> str:
-        """Serialize to string."""
-        return str(value)
-
-    def deserialize(self, value: str | int) -> int:
-        """Deserialize from string or int."""
-        return int(value)
-
-
-class _OptionalIntStrategy(SerializationStrategy):
-    """Deserialize a string-or-int to int|None, with -1 as None."""
-
-    def serialize(self, value: int | None) -> int:
-        """Serialize None back to -1."""
-        return -1 if value is None else value
-
-    def deserialize(self, value: str | int) -> int | None:
-        """Deserialize from string or int, -1 becomes None."""
-        result = int(value)
-        return None if result == -1 else result
-
-
-class _StringToFloatStrategy(SerializationStrategy):
-    """Deserialize a string-encoded float (e.g., heatingSlope "0.0")."""
-
-    def serialize(self, value: float) -> float:
-        """Serialize to float."""
-        return value
-
-    def deserialize(self, value: str | float) -> float:
-        """Deserialize from string, float, or int."""
-        return float(value)
-
-
-class _TimestampStrategy(SerializationStrategy):
-    """Convert a unix timestamp to a UTC datetime."""
-
-    def serialize(self, value: datetime) -> int:
-        """Serialize to unix timestamp."""
-        return int(value.timestamp())
-
-    def deserialize(self, value: int) -> datetime:
-        """Deserialize from unix timestamp."""
-        return datetime.fromtimestamp(value, tz=UTC)
-
-
-class _OptionalTimestampStrategy(SerializationStrategy):
-    """Convert a unix timestamp to a UTC datetime, with -1 as None."""
-
-    def serialize(self, value: datetime | None) -> int:
-        """Serialize to unix timestamp, None becomes -1."""
-        return -1 if value is None else int(value.timestamp())
-
-    def deserialize(self, value: int) -> datetime | None:
-        """Deserialize from unix timestamp, -1 becomes None."""
-        return None if value == -1 else datetime.fromtimestamp(value, tz=UTC)
-
-
-class _TimedeltaSecondsStrategy(SerializationStrategy):
-    """Convert seconds to a timedelta."""
-
-    def serialize(self, value: timedelta) -> int:
-        """Serialize to seconds."""
-        return int(value.total_seconds())
-
-    def deserialize(self, value: int | str) -> timedelta:
-        """Deserialize from seconds (may be string-encoded)."""
-        return timedelta(seconds=int(value))
-
-
-class _BaseModel(DataClassORJSONMixin):
-    """Base model for all Fumis models."""
-
-    # pylint: disable-next=too-few-public-methods
-    class Config(BaseConfig):
-        """Mashumaro configuration."""
-
-        omit_none = True
-        serialization_strategy = {  # noqa: RUF012
-            AwesomeVersion: _AwesomeVersionStrategy(),
-        }
+def _sentinel_epoch(value: int) -> datetime | None:
+    """Map the -1 sentinel to None, otherwise a unix timestamp to a UTC datetime."""
+    seconds = int(value)
+    return None if seconds == -1 else datetime.fromtimestamp(seconds, tz=UTC)
 
 
 @dataclass(frozen=True)
-class FumisDiagnosticItem(_BaseModel):
+class FumisDiagnosticItem:
     """A single diagnostic variable or parameter entry."""
 
     id: int
@@ -128,7 +48,7 @@ class FumisDiagnosticItem(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisDiagnostic(_BaseModel):
+class FumisDiagnostic:
     """FumisDiagnostic data from the Fumis controller."""
 
     variables: list[FumisDiagnosticItem] = field(default_factory=list)
@@ -167,65 +87,52 @@ class FumisDiagnostic(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisTemperature(_BaseModel):
+class FumisTemperature:
     """A temperature channel from the Fumis controller."""
 
     id: int
     actual: float = 0
-    setpoint: float = field(default=0, metadata=field_options(alias="set"))
-    on_main_screen: bool = field(
-        default=False, metadata=field_options(alias="onMainScreen")
-    )
-    actual_type: int = field(default=0, metadata=field_options(alias="actualType"))
-    set_type: int = field(default=0, metadata=field_options(alias="setType"))
+    setpoint: Annotated[float, Key(alias="set")] = 0
+    on_main_screen: Annotated[bool, Key(alias="onMainScreen")] = False
+    actual_type: Annotated[int, Key(alias="actualType")] = 0
+    set_type: Annotated[int, Key(alias="setType")] = 0
     name: str | None = None
     weight: int = 0
 
 
 @dataclass(frozen=True)
-class FumisPower(_BaseModel):
+class FumisPower:
     """FumisPower state of the Fumis controller."""
 
-    kw: float = field(
-        default=0,
-        metadata=field_options(serialization_strategy=_StringToFloatStrategy()),
-    )
-    actual_power: int = field(default=0, metadata=field_options(alias="actualPower"))
-    set_power: int = field(default=0, metadata=field_options(alias="setPower"))
-    set_type: int = field(default=0, metadata=field_options(alias="setType"))
-    actual_type: int = field(default=0, metadata=field_options(alias="actualType"))
+    kw: Annotated[float, Coerce(float)] = 0
+    actual_power: Annotated[int, Key(alias="actualPower")] = 0
+    set_power: Annotated[int, Key(alias="setPower")] = 0
+    set_type: Annotated[int, Key(alias="setType")] = 0
+    actual_type: Annotated[int, Key(alias="actualType")] = 0
 
 
 @dataclass(frozen=True)
-class FumisFan(_BaseModel):
+class FumisFan:
     """A fan entry from the Fumis controller."""
 
     id: int
     speed: int = 0
-    speed_type: int = field(default=0, metadata=field_options(alias="speedType"))
+    speed_type: Annotated[int, Key(alias="speedType")] = 0
     weight: int = 0
 
 
 @dataclass(frozen=True)
-class FumisFuel(_BaseModel):
+class FumisFuel:
     """A fuel entry from the Fumis controller."""
 
     id: int
     quality: int = 0
-    quality_type: int = field(default=0, metadata=field_options(alias="qualityType"))
-    quality_actual: int | None = field(
-        default=None, metadata=field_options(alias="qualityActual")
-    )
+    quality_type: Annotated[int, Key(alias="qualityType")] = 0
+    quality_actual: Annotated[int | None, Key(alias="qualityActual")] = None
     quantity: float | None = None
-    quantity_display: int | None = field(
-        default=None, metadata=field_options(alias="quantityDisplay")
-    )
-    quantity_set_type: int = field(
-        default=0, metadata=field_options(alias="quantitySetType")
-    )
-    quantity_actual_type: int = field(
-        default=0, metadata=field_options(alias="quantityActualType")
-    )
+    quantity_display: Annotated[int | None, Key(alias="quantityDisplay")] = None
+    quantity_set_type: Annotated[int, Key(alias="quantitySetType")] = 0
+    quantity_actual_type: Annotated[int, Key(alias="quantityActualType")] = 0
     name: str | None = None
 
     @property
@@ -240,15 +147,11 @@ class FumisFuel(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisEcoMode(_BaseModel):
+class FumisEcoMode:
     """Eco mode state of the Fumis controller."""
 
-    eco_mode_enable: int | None = field(
-        default=None, metadata=field_options(alias="ecoModeEnable")
-    )
-    eco_mode_set_type: int | None = field(
-        default=None, metadata=field_options(alias="ecoModeSetType")
-    )
+    eco_mode_enable: Annotated[int | None, Key(alias="ecoModeEnable")] = None
+    eco_mode_set_type: Annotated[int | None, Key(alias="ecoModeSetType")] = None
 
     @property
     def enabled(self) -> bool:
@@ -257,16 +160,16 @@ class FumisEcoMode(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisHybrid(_BaseModel):
+class FumisHybrid:
     """FumisHybrid mode state (wood + pellet stoves)."""
 
-    actual_type: int = field(default=0, metadata=field_options(alias="actualType"))
+    actual_type: Annotated[int, Key(alias="actualType")] = 0
     operation: int = 0
     state: int = 0
 
 
 @dataclass(frozen=True)
-class FumisAntifreeze(_BaseModel):
+class FumisAntifreeze:
     """FumisAntifreeze protection settings."""
 
     temperature: float | None = None
@@ -274,53 +177,35 @@ class FumisAntifreeze(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisStatistic(_BaseModel):
+class FumisStatistic:
     """Statistics counters from the Fumis controller."""
 
-    igniter_starts: int = field(
-        default=0, metadata=field_options(alias="igniterStarts")
+    igniter_starts: Annotated[int, Key(alias="igniterStarts")] = 0
+    uptime: Annotated[timedelta, AsTimedelta()] = field(
+        default_factory=lambda: timedelta(0)
     )
-    uptime: timedelta = field(
-        default_factory=lambda: timedelta(0),
-        metadata=field_options(
-            serialization_strategy=_TimedeltaSecondsStrategy(),
-        ),
+    heating_time: Annotated[timedelta, Key(alias="heatingTime"), AsTimedelta()] = field(
+        default_factory=lambda: timedelta(0)
     )
-    heating_time: timedelta = field(
-        default_factory=lambda: timedelta(0),
-        metadata=field_options(
-            alias="heatingTime",
-            serialization_strategy=_TimedeltaSecondsStrategy(),
-        ),
-    )
-    service_time: timedelta = field(
-        default_factory=lambda: timedelta(0),
-        metadata=field_options(
-            alias="serviceTime",
-            serialization_strategy=_TimedeltaSecondsStrategy(),
-        ),
+    service_time: Annotated[timedelta, Key(alias="serviceTime"), AsTimedelta()] = field(
+        default_factory=lambda: timedelta(0)
     )
     overheatings: int = 0
     misfires: int = 0
-    fuel_quantity_used: int = field(
-        default=0, metadata=field_options(alias="fuelQuantityUsed")
-    )
+    fuel_quantity_used: Annotated[int, Key(alias="fuelQuantityUsed")] = 0
 
 
 @dataclass(frozen=True)
-class FumisUnit(_BaseModel):
+class FumisUnit:
     """WiRCU box information."""
 
     id: str = "Unknown"
     type: int = 0
-    version: AwesomeVersion = field(default_factory=lambda: AwesomeVersion("0"))
-    command: int | None = None
-    rssi: int = field(
-        default=-100,
-        metadata=field_options(
-            serialization_strategy=_StringToIntStrategy(),
-        ),
+    version: Annotated[AwesomeVersion, Coerce(AwesomeVersion)] = field(
+        default_factory=lambda: AwesomeVersion("0")
     )
+    command: int | None = None
+    rssi: Annotated[int, Coerce(int)] = -100
     ip: str = "Unknown"
     timezone: str | None = None
     temperature: float | None = None
@@ -388,61 +273,37 @@ class FumisWeekSchedule:
 
 @dataclass(frozen=True)
 # pylint: disable-next=too-many-instance-attributes,too-many-public-methods
-class FumisController(_BaseModel):
+class FumisController:
     """Fumis stove controller state."""
 
     type: int = 0
-    version: AwesomeVersion = field(default_factory=lambda: AwesomeVersion("0"))
+    version: Annotated[AwesomeVersion, Coerce(AwesomeVersion)] = field(
+        default_factory=lambda: AwesomeVersion("0")
+    )
     command: int = -1
     status: int = -1
     error: int = 0
     alert: int = 0
-    heating_slope: float = field(
-        default=0,
-        metadata=field_options(
-            alias="heatingSlope",
-            serialization_strategy=_StringToFloatStrategy(),
-        ),
+    heating_slope: Annotated[float, Key(alias="heatingSlope"), Coerce(float)] = 0
+    current_time: Annotated[datetime, Key(alias="currentTime"), FromEpoch()] = field(
+        default_factory=lambda: datetime.fromtimestamp(0, tz=UTC)
     )
-    current_time: datetime = field(
-        default_factory=lambda: datetime.fromtimestamp(0, tz=UTC),
-        metadata=field_options(
-            alias="currentTime",
-            serialization_strategy=_TimestampStrategy(),
-        ),
-    )
-    timer_enable: bool = field(
-        default=False, metadata=field_options(alias="timerEnable")
-    )
-    fuel_type: int = field(default=0, metadata=field_options(alias="fuelType"))
-    time_to_service: int | None = field(
-        default=None,
-        metadata=field_options(
-            alias="timeToService",
-            serialization_strategy=_OptionalIntStrategy(),
-        ),
-    )
-    delayed_start_at: datetime | None = field(
-        default=None,
-        metadata=field_options(
-            alias="delayedStartAt",
-            serialization_strategy=_OptionalTimestampStrategy(),
-        ),
-    )
-    delayed_stop_at: datetime | None = field(
-        default=None,
-        metadata=field_options(
-            alias="delayedStopAt",
-            serialization_strategy=_OptionalTimestampStrategy(),
-        ),
-    )
+    timer_enable: Annotated[bool, Key(alias="timerEnable")] = False
+    fuel_type: Annotated[int, Key(alias="fuelType")] = 0
+    time_to_service: Annotated[
+        int | None, Key(alias="timeToService"), Maybe(Coerce(_sentinel_int))
+    ] = None
+    delayed_start_at: Annotated[
+        datetime | None, Key(alias="delayedStartAt"), Maybe(Coerce(_sentinel_epoch))
+    ] = None
+    delayed_stop_at: Annotated[
+        datetime | None, Key(alias="delayedStopAt"), Maybe(Coerce(_sentinel_epoch))
+    ] = None
 
     power: FumisPower = field(default_factory=FumisPower)
     statistic: FumisStatistic = field(default_factory=FumisStatistic)
     diagnostic: FumisDiagnostic = field(default_factory=FumisDiagnostic)
-    eco_mode: FumisEcoMode | None = field(
-        default=None, metadata=field_options(alias="ecoMode")
-    )
+    eco_mode: Annotated[FumisEcoMode | None, Key(alias="ecoMode")] = None
     hybrid: FumisHybrid | None = None
     antifreeze: FumisAntifreeze | None = None
     fans: list[FumisFan] = field(default_factory=list)
@@ -457,8 +318,8 @@ class FumisController(_BaseModel):
         return StoveStatus(self.status)
 
     @property
-    def stove_error(self) -> StoveError | None:
-        """Return the stove error as an enum, or None if no error.
+    def stove_error(self) -> StoveError:
+        """Return the stove error as an enum.
 
         Converts the raw integer error code to a StoveError enum
         whose value matches the device display (e.g., E102).
@@ -466,8 +327,8 @@ class FumisController(_BaseModel):
         return StoveError.from_code(self.error)
 
     @property
-    def stove_alert(self) -> StoveAlert | None:
-        """Return the stove alert as an enum, or None if no alert.
+    def stove_alert(self) -> StoveAlert:
+        """Return the stove alert as an enum.
 
         Converts the raw integer alert code to a StoveAlert enum
         whose value matches the device display (e.g., A004).
@@ -662,17 +523,17 @@ class FumisController(_BaseModel):
 
 
 @dataclass(frozen=True)
-class FumisInfo(_BaseModel):
+class FumisInfo(SchemaMixin, extra=REMOVE_EXTRA):
     """Top-level Fumis WiRCU API response.
 
     This is the complete device status returned by GET /v1/status.
     All structured data is accessible via the nested `unit` and
-    `controller` objects.
+    `controller` objects. Parse a raw API payload with `FumisInfo.from_dict`,
+    which validates and constructs the whole tree, dropping unmodeled keys.
     """
 
     unit: FumisUnit = field(default_factory=FumisUnit)
     controller: FumisController = field(default_factory=FumisController)
-    api_version: AwesomeVersion = field(
-        default_factory=lambda: AwesomeVersion("0"),
-        metadata=field_options(alias="apiVersion"),
-    )
+    api_version: Annotated[
+        AwesomeVersion, Key(alias="apiVersion"), Coerce(AwesomeVersion)
+    ] = field(default_factory=lambda: AwesomeVersion("0"))

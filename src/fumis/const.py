@@ -121,6 +121,9 @@ class StoveError(StrEnum):
     Use `StoveError.from_code()` to convert the raw integer from the API.
     """
 
+    NO_ERROR = "E000"
+    """No active error."""
+
     IGNITION_FAILED = "E101"
     """Ignition failed, water overtemperature, or backfire protection."""
 
@@ -197,13 +200,8 @@ class StoveError(StrEnum):
     """Unknown or unmapped error code from the API."""
 
     @classmethod
-    def from_code(cls, code: int) -> StoveError | None:
-        """Convert a raw error code integer to a StoveError enum.
-
-        Returns None when there is no active error (code 0).
-        """
-        if code == 0:
-            return None
+    def from_code(cls, code: int) -> StoveError:
+        """Convert a raw error code integer to a StoveError enum."""
         formatted = f"E{code:03d}"
         try:
             return cls(formatted)
@@ -224,6 +222,9 @@ class StoveAlert(StrEnum):
     Values match the display format on the device (e.g., A004).
     Use `StoveAlert.from_code()` to convert the raw integer from the API.
     """
+
+    NO_ALERT = "A000"
+    """No active alert."""
 
     LOW_FUEL = "A001"
     """Low fuel level - refuel the tank."""
@@ -250,13 +251,8 @@ class StoveAlert(StrEnum):
     """Unknown or unmapped alert code from the API."""
 
     @classmethod
-    def from_code(cls, code: int) -> StoveAlert | None:
-        """Convert a raw alert code integer to a StoveAlert enum.
-
-        Returns None when there is no active alert (code 0).
-        """
-        if code == 0:
-            return None
+    def from_code(cls, code: int) -> StoveAlert:
+        """Convert a raw alert code integer to a StoveAlert enum."""
         formatted = f"A{code:03d}"
         try:
             return cls(formatted)
@@ -272,6 +268,7 @@ class StoveAlert(StrEnum):
 
 
 _ERROR_DESCRIPTIONS: dict[StoveError, str] = {
+    StoveError.NO_ERROR: "No error",
     StoveError.IGNITION_FAILED: (
         "Ignition failed / water overtemperature / backfire protection"
     ),
@@ -301,6 +298,7 @@ _ERROR_DESCRIPTIONS: dict[StoveError, str] = {
 }
 
 _ALERT_DESCRIPTIONS: dict[StoveAlert, str] = {
+    StoveAlert.NO_ALERT: "No alert",
     StoveAlert.LOW_FUEL: "Low fuel level",
     StoveAlert.SERVICE_DUE: "Service due",
     StoveAlert.FLUE_GAS_WARNING: "Flue gas temperature warning",

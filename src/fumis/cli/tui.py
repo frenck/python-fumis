@@ -73,10 +73,10 @@ class StatusWidget(Static):
             eco_str = "\U0001f331 On" if eco.enabled else "Off"
 
         error_str = ""
-        if error := c.stove_error:
+        if (error := c.stove_error) != StoveError.NO_ERROR:
             label = f"E{c.error:03d}" if error == StoveError.UNKNOWN else str(error)
             error_str = f"\u274c {label}: {error.description}"
-        if alert := c.stove_alert:
+        if (alert := c.stove_alert) != StoveAlert.NO_ALERT:
             label = f"A{c.alert:03d}" if alert == StoveAlert.UNKNOWN else str(alert)
             error_str += f"  \u26a0\ufe0f  {label}: {alert.description}"
 
