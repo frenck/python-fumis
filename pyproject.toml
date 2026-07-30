@@ -68,7 +68,7 @@ pylint = "4.0.6"
 pytest = "9.1.1"
 pytest-asyncio = "1.4.0"
 pytest-cov = "7.1.0"
-ruff = "0.15.22"
+ruff = "0.16.0"
 safety = "3.8.1"
 syrupy = "5.5.3"
 typer = "0.25.0"
@@ -117,6 +117,7 @@ asyncio_mode = "auto"
 select = ["ALL"]
 ignore = [
   "ANN401",  # Opinionated warning on disallowing dynamically typed expressions
+  "CPY001",  # New in Ruff 0.16; this project doesn't maintain file headers
   "TRY301",  # Abstract raise to inner function — not useful for this codebase
   "D203",    # Conflicts with other rules
   "D213",    # Conflicts with other rules

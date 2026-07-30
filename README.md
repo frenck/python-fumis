@@ -114,11 +114,11 @@ async def main() -> None:
 
         # Stove identity
         print(info.controller.manufacturer)  # "Austroflamm"
-        print(info.controller.model_name)    # "Clou Duo"
+        print(info.controller.model_name)  # "Clou Duo"
 
         # Status
         print(info.controller.stove_status)  # StoveStatus.OFF
-        print(info.controller.on)            # False
+        print(info.controller.on)  # False
 
         # Temperatures
         main_temp = info.controller.main_temperature
@@ -129,7 +129,9 @@ async def main() -> None:
         print(info.controller.combustion_chamber_temperature)
 
         # Power
-        print(f"{info.controller.power.kw} kW (level {info.controller.power.set_power})")
+        print(
+            f"{info.controller.power.kw} kW (level {info.controller.power.set_power})"
+        )
 
         # Door sensor
         print(f"Door open: {info.controller.door_open}")
@@ -184,17 +186,17 @@ info = await fumis.update_info()
 c = info.controller
 
 # Convenience properties (return None if not available)
-c.exhaust_temperature     # Exhaust gas temp (var[11])
-c.fan1_speed              # Fan 1 speed (var[4])
-c.fan2_speed              # Fan 2 speed (var[12])
-c.f02                     # F02 sensor input (var[34])
-c.pressure                # Pressure sensor (var[35])
-c.door_open               # Door sensor (var[33]) - True/False/None
-c.stove_model             # Stove model ID (var[96])
-c.parameter_version       # Parameter version (var[97])
+c.exhaust_temperature  # Exhaust gas temp (var[11])
+c.fan1_speed  # Fan 1 speed (var[4])
+c.fan2_speed  # Fan 2 speed (var[12])
+c.f02  # F02 sensor input (var[34])
+c.pressure  # Pressure sensor (var[35])
+c.door_open  # Door sensor (var[33]) - True/False/None
+c.stove_model  # Stove model ID (var[96])
+c.parameter_version  # Parameter version (var[97])
 
 # Raw diagnostic access (escape hatch)
-c.diagnostic.variable(42)   # Any variable by ID → int | None
+c.diagnostic.variable(42)  # Any variable by ID → int | None
 c.diagnostic.parameter(14)  # Any parameter by ID → int | None
 
 # All temperature channels
@@ -260,8 +262,8 @@ Status codes use proper Python enums, booleans where they make sense:
 from fumis import StoveStatus
 
 info.controller.stove_status == StoveStatus.COMBUSTION  # True
-info.controller.on                                      # True
-info.controller.eco_mode.enabled                        # False
+info.controller.on  # True
+info.controller.eco_mode.enabled  # False
 
 # Unknown values from the API are handled gracefully
 StoveStatus(999)  # StoveStatus.UNKNOWN (never crashes)
