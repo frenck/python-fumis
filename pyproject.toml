@@ -117,6 +117,7 @@ asyncio_mode = "auto"
 select = ["ALL"]
 ignore = [
   "ANN401",  # Opinionated warning on disallowing dynamically typed expressions
+  "CPY001",  # New in Ruff 0.16; this project doesn't maintain file headers
   "TRY301",  # Abstract raise to inner function — not useful for this codebase
   "D203",    # Conflicts with other rules
   "D213",    # Conflicts with other rules
