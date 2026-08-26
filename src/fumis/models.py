@@ -393,7 +393,7 @@ class FumisController(_BaseModel):
 
     type: int = 0
     version: AwesomeVersion = field(default_factory=lambda: AwesomeVersion("0"))
-    command: int = -1
+    command: int | None = None
     status: int = -1
     error: int = 0
     alert: int = 0
