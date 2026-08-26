@@ -377,6 +377,26 @@ async def test_info_pellet_stove_simple(
     assert info.unit.temperature is None
 
 
+async def test_info_null_controller_command(
+    responses: aioresponses,
+    fumis: Fumis,
+    snapshot: SnapshotAssertion,
+) -> None:
+    """Test a controller that reports a null command instead of an integer."""
+    responses.get(
+        f"{API_BASE}status",
+        status=200,
+        body=load_fixture("austroflamm_clou_duo_no_command.json"),
+        content_type="application/json",
+    )
+    info = await fumis.update_info()
+    assert info == snapshot
+
+    # No command is pending, the controller has acknowledged the last one
+    assert info.controller.command is None
+    assert info.controller.stove_status == StoveStatus.OFF
+
+
 # --- Fixture-specific assertions ---
 
 
