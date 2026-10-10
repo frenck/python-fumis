@@ -150,7 +150,7 @@ class TemperatureDialog(ModalScreen[float | None]):
     }
     """
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding | tuple[str, str] | tuple[str, str, str]]] = [
         Binding("up", "adjust(0.5)", show=False),
         Binding("down", "adjust(-0.5)", show=False),
         Binding("+", "adjust(0.1)", show=False),
@@ -215,7 +215,7 @@ class PowerDialog(ModalScreen[int | None]):
     }
     """
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding | tuple[str, str] | tuple[str, str, str]]] = [
         Binding("up", "adjust(1)", show=False),
         Binding("down", "adjust(-1)", show=False),
         Binding("+", "adjust(1)", show=False),
@@ -280,7 +280,7 @@ class ConfirmDialog(ModalScreen[bool]):
     }
     """
 
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding | tuple[str, str] | tuple[str, str, str]]] = [
         Binding("enter", "yes", show=False),
         Binding("y", "yes", show=False),
         Binding("escape", "no", "Cancel"),
@@ -353,7 +353,7 @@ class FumisTuiApp(App[None]):
     """
 
     TITLE = "\U0001f525 Fumis WiRCU"
-    BINDINGS: ClassVar[list[Binding]] = [
+    BINDINGS: ClassVar[list[Binding | tuple[str, str] | tuple[str, str, str]]] = [
         Binding("q", "quit", "Quit"),
         Binding("r", "refresh", "Refresh"),
         Binding("1", "turn_on", "Turn On"),
