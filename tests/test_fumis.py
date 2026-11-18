@@ -567,6 +567,12 @@ def test_controller_temperature_channel_not_found() -> None:
     assert info.controller.temperature_channel(99) is None
 
 
+def test_null_heating_slope() -> None:
+    """Test a controller that reports a null heating slope."""
+    info = FumisInfo.from_dict({"controller": {"heatingSlope": None}})
+    assert info.controller.heating_slope is None
+
+
 def test_controller_main_temperature_empty() -> None:
     """Test main temperature returns None when no temperatures exist."""
     info = FumisInfo.from_dict({})
