@@ -397,7 +397,7 @@ class FumisController(_BaseModel):
     status: int = -1
     error: int = 0
     alert: int = 0
-    heating_slope: float = field(
+    heating_slope: float | None = field(
         default=0,
         metadata=field_options(
             alias="heatingSlope",
